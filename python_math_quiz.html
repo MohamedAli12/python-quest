@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الواحة التقنية — Python for Math تقن 221</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0ea271;--green-dark:#0b7a56;--green-light:#e8f8f2;
+  --blue:#2563eb;--blue-light:#eff6ff;
+  --amber:#d97706;--amber-light:#fffbeb;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --red:#dc2626;--red-light:#fef2f2;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-500:#6b7280;--gray-700:#374151;--gray-900:#111827;
+  --bg:#fff;--surface:#f8fafc;--border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.10);
+  --radius:14px;--radius-sm:8px;
+  --font:'IBM Plex Sans Arabic',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--surface);color:var(--gray-900);min-height:100vh;line-height:1.6}
+.site-header{background:linear-gradient(135deg,#0b1f3a 0%,#0d2d4a 50%,#0e3a60 100%);padding:28px 24px 36px;text-align:center;position:relative;overflow:hidden}
+.site-header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
+.header-badge{display:inline-block;background:rgba(14,162,113,.2);border:1px solid rgba(14,162,113,.4);color:#4ade80;font-size:12px;font-weight:500;padding:4px 14px;border-radius:20px;margin-bottom:14px;letter-spacing:.5px}
+.header-title{font-size:clamp(24px,5vw,40px);font-weight:700;color:#fff;margin-bottom:6px}
+.header-title span{color:#4ade80}
+.header-sub{font-size:14px;color:rgba(255,255,255,.6);max-width:500px;margin:0 auto}
+.main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+.screen{display:none;animation:fadeUp .3s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.card-title{font-size:19px;font-weight:600;color:var(--gray-900);margin-bottom:5px}
+.card-sub{font-size:14px;color:var(--gray-500);margin-bottom:22px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--gray-700);margin-bottom:5px}
+.form-input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:var(--font);color:var(--gray-900);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(14,162,113,.12)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;background:#fff;color:var(--gray-700);transition:all .15s}
+.btn:hover{background:var(--gray-50);border-color:var(--gray-300)}
+.btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-primary:hover{background:var(--green-dark);border-color:var(--green-dark)}
+.btn-full{width:100%;justify-content:center;padding:12px;font-size:15px}
+.unit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}
+@media(max-width:560px){.unit-grid{grid-template-columns:1fr}}
+.unit-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 14px;cursor:pointer;background:#fff;transition:all .2s;position:relative;overflow:hidden}
+.unit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.unit-card.u1::before{background:var(--green)}
+.unit-card.u2::before{background:var(--blue)}
+.unit-card.u3::before{background:var(--amber)}
+.unit-card.u4::before{background:var(--purple)}
+.unit-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--gray-300)}
+.unit-card.selected{border-width:2px}
+.unit-card.u1.selected{border-color:var(--green)}
+.unit-card.u2.selected{border-color:var(--blue)}
+.unit-card.u3.selected{border-color:var(--amber)}
+.unit-card.u4.selected{border-color:var(--purple)}
+.unit-icon{font-size:26px;margin-bottom:7px}
+.unit-name{font-size:14px;font-weight:600;color:var(--gray-900)}
+.unit-lessons{font-size:12px;color:var(--gray-500);margin-top:3px}
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:500px){.level-grid{grid-template-columns:1fr}}
+.level-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;position:relative;overflow:hidden}
+.level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.level-card.l1::before{background:var(--green)}
+.level-card.l2::before{background:var(--blue)}
+.level-card.l3::before{background:var(--amber)}
+.level-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.level-icon{font-size:28px;margin-bottom:8px}
+.level-name{font-size:14px;font-weight:600;color:var(--gray-900)}
+.level-desc{font-size:11px;color:var(--gray-500);margin-top:3px}
+.level-count{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.l1 .level-count{background:var(--green-light);color:var(--green-dark)}
+.l2 .level-count{background:var(--blue-light);color:var(--blue)}
+.l3 .level-count{background:var(--amber-light);color:var(--amber)}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.quiz-title{font-size:14px;font-weight:600;color:var(--gray-700)}
+.quiz-counter{font-size:13px;color:var(--gray-500);background:var(--gray-100);padding:3px 11px;border-radius:20px}
+.progress-track{height:5px;background:var(--gray-200);border-radius:3px;margin-bottom:22px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#4ade80);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.q-text{font-size:15px;font-weight:500;color:var(--gray-900);line-height:1.75;margin-bottom:14px}
+.code-block{background:#0d1117;color:#e6edf3;font-family:var(--mono);font-size:13px;padding:14px;border-radius:var(--radius-sm);margin-bottom:14px;direction:ltr;text-align:left;overflow-x:auto;line-height:1.65;white-space:pre}
+.kw{color:#ff7b72}.sv{color:#a5d6ff}.cm{color:#8b949e}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media(max-width:520px){.options{grid-template-columns:1fr}}
+.option{padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-family:var(--font);color:var(--gray-700);background:#fff;transition:all .15s;text-align:right;line-height:1.5}
+.option:hover:not(.disabled){background:var(--gray-50);border-color:var(--gray-300)}
+.option.correct{background:var(--green-light);border-color:var(--green);color:var(--green-dark);font-weight:500}
+.option.wrong{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.option.disabled{pointer-events:none}
+.fill-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--mono);color:var(--gray-900);background:#fff;direction:ltr;text-align:left;margin-top:4px;outline:none;transition:border-color .2s}
+.fill-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(14,162,113,.12)}
+.fill-input.correct{border-color:var(--green);background:var(--green-light)}
+.fill-input.wrong{border-color:var(--red);background:var(--red-light)}
+.feedback{display:none;padding:9px 13px;border-radius:var(--radius-sm);font-size:13px;margin-top:11px;line-height:1.6}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-light);color:var(--green-dark);border:1px solid rgba(14,162,113,.3)}
+.feedback.err{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.25)}
+.quiz-actions{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+.hint-box{background:var(--blue-light);border:1px solid rgba(37,99,235,.2);border-radius:var(--radius-sm);padding:9px 13px;font-size:13px;color:var(--blue);margin-top:9px;display:none}
+.hint-box.show{display:block}
+.score-center{text-align:center;padding:18px 0 26px}
+.score-circle{width:100px;height:100px;border-radius:50%;background:var(--green-light);border:3px solid var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 14px}
+.score-big{font-size:28px;font-weight:700;color:var(--green-dark);line-height:1}
+.score-label{font-size:11px;color:var(--green);margin-top:2px}
+.score-pct{font-size:21px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
+.result-badge{display:inline-block;padding:5px 18px;border-radius:20px;font-size:13px;font-weight:500;margin-top:4px}
+.result-pass{background:var(--green-light);color:var(--green-dark)}
+.result-fail{background:var(--red-light);color:var(--red)}
+.result-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.cert-outer{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg);margin-bottom:18px}
+.cert-top-bar{height:7px;background:linear-gradient(90deg,#0ea271,#2563eb,#d97706,#7c3aed)}
+.cert-inner{padding:36px 32px;text-align:center;position:relative}
+.cert-inner::before{content:'';position:absolute;inset:12px;border:1px solid rgba(14,162,113,.18);border-radius:8px;pointer-events:none}
+.cert-logo{font-size:44px;margin-bottom:7px}
+.cert-heading{font-size:12px;font-weight:500;color:var(--gray-500);letter-spacing:2px;margin-bottom:3px}
+.cert-main-title{font-size:26px;font-weight:700;color:var(--gray-900);margin-bottom:5px}
+.cert-course{font-size:13px;color:var(--gray-500);margin-bottom:24px}
+.cert-divider{height:1px;background:var(--border);margin:18px 0}
+.cert-presents{font-size:13px;color:var(--gray-500);margin-bottom:7px}
+.cert-student-name{font-size:28px;font-weight:700;color:var(--green-dark);margin-bottom:5px}
+.cert-details{font-size:13px;color:#555;margin-bottom:4px}
+.cert-unit-name{font-size:17px;font-weight:600;color:var(--blue);margin-bottom:7px}
+.cert-stars{font-size:26px;letter-spacing:4px;margin:9px 0}
+.cert-score{display:inline-block;background:var(--green-light);color:var(--green-dark);font-size:15px;font-weight:600;padding:7px 26px;border-radius:30px;margin:7px 0}
+.cert-footer{margin-top:22px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:10px}
+.cert-footer-label{font-size:11px;color:var(--gray-400);margin-bottom:3px;text-align:center}
+.cert-footer-val{font-size:13px;font-weight:500;color:var(--gray-700);text-align:center}
+.cert-seal{width:64px;height:64px;border:2px solid var(--green);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;background:var(--green-light)}
+.cert-seal-text{font-size:9px;font-weight:600;color:var(--green-dark);text-align:center;line-height:1.3}
+.breadcrumb{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray-500);margin-bottom:16px;flex-wrap:wrap}
+.breadcrumb span{color:var(--green);font-weight:500}
+footer{background:#0b1f3a;color:rgba(255,255,255,.55);text-align:center;padding:18px 16px;font-size:13px;line-height:1.8}
+@media print{
+  body{background:#fff}
+  .no-print{display:none!important}
+  .site-header,footer{display:none}
+  .main{padding:0}
+  .cert-outer{box-shadow:none;border:2px solid var(--green)}
+  .screen{display:block!important}
+  #s0,#s1,#s2,#s3,#s4{display:none!important}
+  #s5{display:block!important}
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-badge">الواحة التقنية — مملكة البحرين</div>
+  <div class="header-title">🐍 Python <span>for Math</span></div>
+  <div class="header-sub">بنك أسئلة تفاعلي — مقرر تقن 221 | الفصل الدراسي الثاني 2025-2026</div>
+</header>
+<main class="main">
+
+<!-- S0 -->
+<div id="s0" class="screen active">
+  <div class="card" style="text-align:center;padding:36px 26px">
+    <div style="font-size:52px;margin-bottom:14px">🎯</div>
+    <div class="card-title" style="font-size:22px;margin-bottom:8px">اختبر معلوماتك</div>
+    <p style="color:var(--gray-500);font-size:14px;max-width:460px;margin:0 auto 24px;line-height:1.7">بنك أسئلة يغطي الوحدات الأربع من مقرر البايثون للرياضيات — ثلاثة مستويات لكل وحدة مع شهادة إتمام قابلة للطباعة.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:480px;margin:0 auto 24px">
+      <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px 8px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:3px">📚</div><div style="font-size:11px;font-weight:600;color:var(--gray-700)">4 وحدات</div></div>
+      <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px 8px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:3px">🏆</div><div style="font-size:11px;font-weight:600;color:var(--gray-700)">12 مستوى</div></div>
+      <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px 8px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:3px">❓</div><div style="font-size:11px;font-weight:600;color:var(--gray-700)">120 سؤال</div></div>
+      <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px 8px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:3px">🏅</div><div style="font-size:11px;font-weight:600;color:var(--gray-700)">شهادة</div></div>
+    </div>
+    <button class="btn btn-primary" style="font-size:15px;padding:13px 40px" onclick="goTo('s1')">ابدأ الآن ←</button>
+  </div>
+</div>
+
+<!-- S1 -->
+<div id="s1" class="screen">
+  <div class="breadcrumb no-print">الرئيسية <span>/ بيانات الطالب</span></div>
+  <div class="card">
+    <div class="card-title">📋 بيانات الطالب</div>
+    <div class="card-sub">أدخل بياناتك لتظهر على شهادة الإتمام</div>
+    <div class="form-group"><label class="form-label">الاسم الثلاثي *</label><input type="text" id="stName" class="form-input" placeholder="مثال: محمد أحمد العلي"></div>
+    <div class="form-group"><label class="form-label">اسم المدرسة *</label><input type="text" id="stSchool" class="form-input" placeholder="مثال: مدرسة النعيم الثانوية للبنين"></div>
+    <div class="form-group"><label class="form-label">الصف الدراسي *</label><input type="text" id="stGrade" class="form-input" placeholder="مثال: الحادي عشر أ"></div>
+    <button class="btn btn-primary btn-full" onclick="submitInfo()">متابعة — اختيار الوحدة ←</button>
+  </div>
+</div>
+
+<!-- S2 -->
+<div id="s2" class="screen">
+  <div class="breadcrumb no-print">الرئيسية / البيانات <span>/ اختيار الاختبار</span></div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px">📖 اختر الوحدة</div>
+    <div class="unit-grid">
+      <div class="unit-card u1 selected" id="uc1" onclick="selectUnit(1)"><div class="unit-icon">🔧</div><div class="unit-name">الوحدة الأولى</div><div class="unit-lessons">علاقة الرياضيات بالبرمجة وتوظيف المكتبات</div></div>
+      <div class="unit-card u2" id="uc2" onclick="selectUnit(2)"><div class="unit-icon">⚡</div><div class="unit-name">الوحدة الثانية</div><div class="unit-lessons">القيم المطلقة، الأنظمة غير الخطية، المعادلات التربيعية</div></div>
+      <div class="unit-card u3" id="uc3" onclick="selectUnit(3)"><div class="unit-icon">🔢</div><div class="unit-name">الوحدة الثالثة</div><div class="unit-lessons">المصفوفات: مقدمة، العمليات الحسابية، الأنظمة الخطية</div></div>
+      <div class="unit-card u4" id="uc4" onclick="selectUnit(4)"><div class="unit-icon">📈</div><div class="unit-name">الوحدة الرابعة</div><div class="unit-lessons">رسم المعادلات بيانياً باستخدام matplotlib</div></div>
+    </div>
+    <div class="card-title" style="margin-bottom:12px">🎯 اختر المستوى</div>
+    <div class="level-grid">
+      <div class="level-card l1" onclick="startQuiz(1)"><div class="level-icon">⭐</div><div class="level-name">المستوى الأول</div><div class="level-desc">مفاهيم أساسية</div><div class="level-count">10 أسئلة</div></div>
+      <div class="level-card l2" onclick="startQuiz(2)"><div class="level-icon">⭐⭐</div><div class="level-name">المستوى الثاني</div><div class="level-desc">تطبيق وتحليل</div><div class="level-count">10 أسئلة</div></div>
+      <div class="level-card l3" onclick="startQuiz(3)"><div class="level-icon">⭐⭐⭐</div><div class="level-name">المستوى الثالث</div><div class="level-desc">متقدم وتصحيح أخطاء</div><div class="level-count">10 أسئلة</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div id="s3" class="screen">
+  <div class="breadcrumb no-print" id="quizBread"></div>
+  <div class="card">
+    <div class="quiz-header"><div class="quiz-title" id="quizTitleEl"></div><div class="quiz-counter" id="qCountEl"></div></div>
+    <div class="progress-track"><div class="progress-fill" id="progBar" style="width:0%"></div></div>
+    <div id="questionArea"></div>
+    <div class="quiz-actions">
+      <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" style="display:none">✓ تحقق</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQ()" style="display:none">التالي ←</button>
+      <button class="btn no-print" onclick="if(confirm('هل تريد إنهاء الاختبار؟'))goTo('s2')" style="margin-right:auto">✕ إنهاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div id="s4" class="screen">
+  <div class="breadcrumb no-print">الرئيسية / <span>النتيجة</span></div>
+  <div class="card">
+    <div class="score-center">
+      <div class="score-circle"><div class="score-big" id="scoreNum">0/10</div><div class="score-label">إجابة صحيحة</div></div>
+      <div class="score-pct" id="scorePct"></div>
+      <div class="result-badge" id="resultBadge"></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:18px">
+      <div class="result-actions">
+        <button class="btn btn-primary" id="certBtn" onclick="showCert()" style="display:none">🏅 عرض الشهادة</button>
+        <button class="btn" onclick="retryQuiz()">🔄 إعادة المحاولة</button>
+        <button class="btn" onclick="goTo('s2')">📚 اختبار آخر</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div id="s5" class="screen">
+  <div class="no-print" style="display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة الشهادة</button>
+    <button class="btn" onclick="goTo('s4')">← العودة</button>
+    <button class="btn" onclick="goTo('s2')">📚 اختبار آخر</button>
+  </div>
+  <div class="cert-outer">
+    <div class="cert-top-bar"></div>
+    <div class="cert-inner">
+      <div class="cert-logo">🏅</div>
+      <div class="cert-heading">شهادة إتمام</div>
+      <div class="cert-main-title">الواحة التقنية</div>
+      <div class="cert-course">Python for Math — مقرر البايثون للرياضيات | تقن 221</div>
+      <div class="cert-divider"></div>
+      <div class="cert-presents">تُقدَّم هذه الشهادة من <strong>مدرسة النعيم الثانوية للبنين</strong> للطالب / الطالبة</div>
+      <div class="cert-student-name" id="cName"></div>
+      <div class="cert-details" id="cGradeEl"></div>
+      <div class="cert-presents" style="margin-top:3px" id="cSchoolEl"></div>
+      <div class="cert-divider"></div>
+      <div class="cert-presents">تقديراً لإتمامه / إتمامها اختبار</div>
+      <div class="cert-unit-name" id="cUnit"></div>
+      <div class="cert-stars" id="cStars"></div>
+      <div class="cert-score" id="cScore"></div>
+      <div class="cert-footer">
+        <div><div class="cert-footer-label">المستوى</div><div class="cert-footer-val" id="cLevel"></div></div>
+        <div><div class="cert-seal"><div class="cert-seal-text">الواحة<br>التقنية</div></div></div>
+        <div><div class="cert-footer-label">التاريخ</div><div class="cert-footer-val" id="cDate"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer class="no-print">
+  <div style="max-width:900px;margin:0 auto">
+    <div style="color:rgba(255,255,255,.85);font-size:14px;font-weight:500;margin-bottom:3px">الواحة التقنية — Python for Math | تقن 221</div>
+    <div>إعداد: <span style="color:#4ade80;font-weight:500">أ. محمد الحواج</span> &nbsp;|&nbsp; مدرسة النعيم الثانوية للبنين</div>
+    <div style="margin-top:3px;font-size:12px;color:rgba(255,255,255,.35)">الفصل الدراسي الثاني 2025-2026 &nbsp;|&nbsp; مملكة البحرين</div>
+  </div>
+</footer>
+
+<script>
+var ST={name:'',school:'',grade:''};
+var CU=1,CL=1,CQS=[],CI=0,SC=0,ANS=false;
+
+var QDB={
+1:{
+1:[
+  {t:'mc',q:'الرياضيات هي أساس علوم الحاسوب، من أين نشأت علوم الحاسوب؟',o:['من الفيزياء والكيمياء','من الرياضيات مباشرة','من الفلسفة','من الهندسة الكهربائية فقط'],a:1},
+  {t:'mc',q:'ما المقصود بالمكتبة البرمجية في بايثون؟',o:['مجموعة وحدات نمطية تحتوي على دوال قابلة للاستخدام','مجموعة ملفات نصية','برنامج مستقل','أداة تصميم واجهات'],a:0},
+  {t:'mc',q:'أي مكتبة تُستخدم لتوليد الأعداد العشوائية؟',o:['sys','math','random','datetime'],a:2},
+  {t:'mc',q:'أي مكتبة للعمليات الرياضية البسيطة مثل الجذر التربيعي؟',o:['numpy','sympy','math','pandas'],a:2},
+  {t:'mc',q:'ما الفرق بين المكتبة المضمنة والخارجية؟',o:['المضمنة مدفوعة','المضمنة موجودة افتراضياً ولا تحتاج تثبيتاً','المضمنة أبطأ','لا فرق'],a:1},
+  {t:'mc',q:'ما وظيفة مكتبة matplotlib؟',o:['التعامل مع المصفوفات','حل المعادلات رمزياً','تحويل البيانات إلى رسوم بيانية','تحليل البيانات'],a:2},
+  {t:'mc',q:'ما وظيفة مكتبة sympy؟',o:['عمليات حسابية رمزية وحل المعادلات','التعامل مع المصفوفات الكبيرة','رسم البيانات','تحليل البيانات'],a:0},
+  {t:'mc',q:'أي مكتبة للتعامل مع المصفوفات الكبيرة والحسابات العلمية؟',o:['math','sympy','matplotlib','numpy'],a:3},
+  {t:'mc',q:'لماذا يحتاج المبرمج إلى تعلم الرياضيات؟',o:['لا علاقة لهما','لفهم الخوارزميات وحل المشكلات وبناء برامج أكفأ','للألعاب فقط','لتاريخ الحاسوب فقط'],a:1},
+  {t:'mc',q:'أي الفروع الرياضية مهمة للمبرمج؟',o:['الرسم الهندسي اليدوي','الجبر الخطي والإحصاء ونظرية الأعداد','الحساب الأساسي فقط','الهندسة المعمارية'],a:1}
+],
+2:[
+  {t:'mc',q:'ما الطريقة الصحيحة لاستيراد مكتبة math كاملة؟',o:['from math import *','import math','math import','load math'],a:1},
+  {t:'mc',q:'ما الطريقة الصحيحة لاستيراد دالة sqrt فقط من math؟',o:['import sqrt from math','from math import sqrt','math.import(sqrt)','load math.sqrt'],a:1},
+  {t:'mc',q:'ما ميزة استخدام "as" عند استيراد مكتبة؟',o:['يزيد السرعة','يجعل الاسم أقصر ويقلل تعارض الأسماء','يقلل الذاكرة','لا ميزة'],a:1},
+  {t:'code',q:'import math\nprint(math.sqrt(25))',o:['5','5.0','25','خطأ'],a:1},
+  {t:'mc',q:'أي جملة صحيحة لاستيراد دالة roots من numpy؟',o:['import roots from numpy','from numpy import roots','numpy import roots','from roots import numpy'],a:1},
+  {t:'mc',q:'لماذا نفضل استيراد دوال محددة بدل المكتبة كاملة؟',o:['الكاملة لا تعمل','لتحسين الأداء وتجنب تعارض الأسماء','الاستيراد الكامل مستحيل','لا فرق'],a:1},
+  {t:'fill',q:'أكمل الجملة لاستيراد numpy باسم مستعار np:\nimport ________ as np',a:'numpy',h:'اسم المكتبة هو numpy'},
+  {t:'fill',q:'أكمل الجملة لاستيراد دالة factorial من math:\nfrom math import ________',a:'factorial',h:'دالة المضروب'},
+  {t:'mc',q:'عند كتابة: from math import sqrt as s\nكيف تستدعي الدالة؟',o:['math.sqrt(x)','sqrt(x)','s(x)','from.s(x)'],a:2},
+  {t:'mc',q:'ما وظيفة الدالة math.factorial(x)؟',o:['الجذر التربيعي','مضروب العدد x','قيمة π','جيب الزاوية'],a:1}
+],
+3:[
+  {t:'code',q:'from math import sqrt\nprint(sqrt(16))',o:['4','4.0','16.0','خطأ'],a:1},
+  {t:'code',q:'import math as m\nprint(math.sqrt(9))',o:['يجب كتابة m.sqrt(9)','يجب استيراد sqrt منفردة','لا يوجد خطأ','يجب from بدل import'],a:0},
+  {t:'mc',q:'بعد تغيير الاستيراد إلى: import math as m\nماذا يصبح: res=factorial(5)؟',o:['res=m.factorial(5)','res=math.factorial(5)','res=factorial.m(5)','res=m(factorial,5)'],a:0},
+  {t:'fill',q:'أكمل البرنامج لإيجاد المسافة بين نقطتين:\nimport math\na1=[5,6]\na2=[2,4]\nd=math.________(a1,a2)\nprint(d)',a:'dist',h:'دالة المسافة الإقليدية في math'},
+  {t:'code',q:'from sympy import Symbol,Eq,solve\na=Symbol("a","real=true")',o:['يجب real=True بدون تنصيص','يجب import sympy فقط','اسم المتغير خاطئ','لا يوجد خطأ'],a:0},
+  {t:'code',q:'from numpy import *\nx=array([1,2,3])\nprint(x[1])',o:['1','2','3','خطأ'],a:1},
+  {t:'mc',q:'أي طريقة استيراد الأفضل لتجنب التعارض وتحسين القراءة؟',o:['from numpy import *','import numpy','import numpy as np','from numpy import array,add'],a:2},
+  {t:'fill',q:'أكمل البرنامج لتوليد عدد عشوائي بين 1 و10:\nimport random\nrnd=random.________(1,10)\nprint(rnd)',a:'randrange',h:'دالة النطاق العشوائي'},
+  {t:'code',q:'from sumpy import Symbol,Eq,solve\nx=Symbol("x",real=True)',o:['اسم المكتبة خاطئ يجب sympy','يجب import فقط','Symbol لا تقبل real=True','لا يوجد خطأ'],a:0},
+  {t:'mc',q:'ما نوع الاستيراد في:\nfrom random import randint as intrd',o:['استيراد مكتبة كاملة','استيراد مكتبة باسم مستعار','استيراد دالة محددة باسم مستعار','استيراد جميع الدوال'],a:2}
+]},
+2:{
+1:[
+  {t:'mc',q:'ما تعريف معادلة القيمة المطلقة؟',o:['معادلة من الدرجة الثانية','معادلة تحتوي على قيمة مطلقة وتُكتب |a+b|=x','معادلة بمتغيرين','معادلة خطية بسيطة'],a:1},
+  {t:'mc',q:'أي مكتبة لحل معادلات القيمة المطلقة؟',o:['numpy','math','sympy','matplotlib'],a:2},
+  {t:'mc',q:'أي دالة تعرّف متغيراً رمزياً في sympy؟',o:['abs','solve','Symbol','Eq'],a:2},
+  {t:'mc',q:'أي دالة تعرّف المعادلة في sympy؟',o:['Symbol','solve','abs','Eq'],a:3},
+  {t:'mc',q:'ما الطريقة الصحيحة لتعريف المتغير x رمزياً؟',o:['x=Symbol(x,real=True)','x=Symbol("x",real=True)','x=Eq("x",real=True)','x=abs("x",real=True)'],a:1},
+  {t:'mc',q:'ما المقصود بالقيمة المطلقة رياضياً؟',o:['قيمة سالبة دائماً','المسافة عن الصفر وهي دائماً موجبة أو صفر','أكبر من الصفر فقط','تساوي الصفر دائماً'],a:1},
+  {t:'mc',q:'كم حلاً تعطي معادلة القيمة المطلقة عادةً؟',o:['حل واحد فقط','حلين أو أكثر في الغالب','لا حل لها','ثلاثة دائماً'],a:1},
+  {t:'mc',q:'ما الدالة للحصول على القيمة المطلقة؟',o:['Eq','Symbol','abs','solve'],a:2},
+  {t:'mc',q:'الطريقة الصحيحة لاستدعاء دوال sympy:',o:['import Symbol import sympy','from Symbol import sympy','from sympy import Symbol,Eq,solve','import sympy.Symbol'],a:2},
+  {t:'mc',q:'ما الدالة لإيجاد حل المعادلة في sympy؟',o:['Symbol','Eq','abs','solve'],a:3}
+],
+2:[
+  {t:'mc',q:'ما الطريقة الصحيحة لتعريف |x+2|=3 في المتغير e؟',o:['e=Eq(x+2,3)','e=Eq(abs(x+2),3)','e=abs(Eq(x+2,3))','e=Eq(3,abs(x+2))'],a:1},
+  {t:'mc',q:'ما الطريقة الصحيحة لحل معادلتين e1 و e2 للمتغيرين x و y؟',o:['solve((x,y),(e1,e2))','solve((e1,x),(e2,y))','solve((e1,e2),(x,y))','solve((x,e1),(y,e2))'],a:2},
+  {t:'code',q:'from sympy import Symbol,Eq,solve\nx=Symbol("x",real=True)\nz=Eq(abs(x+5),10)\ny=solve(z,x)\nprint(y)',o:['[-15, 5]','[5, 15]','[-5, 10]','[10, -10]'],a:0},
+  {t:'mc',q:'في الأنظمة غير الخطية ما الشرط الأساسي؟',o:['كل المعادلات من الدرجة الأولى','لا تكون المعادلتان كلتاهما من الدرجة الأولى','معادلة واحدة فقط','استخدام numpy'],a:1},
+  {t:'mc',q:'أي مكتبة لحل المعادلات التربيعية بدالة roots؟',o:['sympy','math','matplotlib','numpy'],a:3},
+  {t:'mc',q:'ما الدالة لإيجاد جذور المعادلة التربيعية في numpy؟',o:['solve','roots','array','linspace'],a:1},
+  {t:'mc',q:'ما معاملات: 3x²+6x-10=0 ؟',o:['[6,3,10]','[3,6,-10]','[10,6,3]','[3,10,6]'],a:1},
+  {t:'code',q:'from numpy import roots\ncof=[1,0,-64]\nsolv=roots(cof)\nprint(solv)',o:['[ 8. -8.]','[64.  0.]','[ 8.  0.]','خطأ'],a:0},
+  {t:'fill',q:'أكمل مصفوفة معاملات المعادلة x²-9x=0:\ncof=________',a:'[1,-9,0]',h:'المعاملات: a=1، b=-9، c=0'},
+  {t:'mc',q:'سبب الخطأ في:\nfrom sumpy import roots',o:['يجب sympy وليس sumpy','يجب numpy','لا خطأ','يجب solve'],a:0}
+],
+3:[
+  {t:'code',q:'from sympy import Symbol,Eq,solve\ny=Symbol("y",real=True)\neq=Eq(abs(5y-10),20)',o:['يجب 5*y وليس 5y','يجب numpy','abs غير موجودة في sympy','real=False المطلوب'],a:0},
+  {t:'mc',q:'عند تغيير الاستيراد إلى: import sympy as sp\nماذا يصبح تعريف x؟',o:['x=Symbol("x",real=True)','x=sp.Symbol("x",real=True)','x=sympy.Symbol("x",real=True)','x=sp.symbol("x",real=True)'],a:1},
+  {t:'fill',q:'أكمل لحل |4x-10|=|x+1|:\nfrom sympy import Symbol,Eq,solve\nx=Symbol("x",real=True)\neq=Eq(abs(4*x-10),________)\nsol=solve(eq,x)\nprint(sol)',a:'abs(x+1)',h:'الطرف الأيمن هو القيمة المطلقة لـ (x+1)'},
+  {t:'code',q:'from sympy import Symbol,Eq,solve\nz=Symbol(z,real=True)',o:['يجب التنصيص: Symbol("z",real=True)','يجب numpy','real=True خاطئ','لا يوجد خطأ'],a:0},
+  {t:'mc',q:'لحل 3xy+4y=7, 2x-y=1\nما صياغة المعادلة الأولى؟',o:['eq1=Eq(3xy+4y,7)','eq1=Eq(3*x*y+4*y,7)','eq1=Eq(3x*y+4y,7)','eq1=solve(3*x*y+4*y,7)'],a:1},
+  {t:'fill',q:'أكمل لحل: x²+y²=5, x-y=-5:\nfrom sympy import Symbol,Eq,solve\nx=Symbol("x",real=True)\ny=Symbol("y",real=True)\neq1=Eq(x**2+y**2,5)\neq2=Eq(________,-5)\nres=solve((eq1,eq2),(x,y))\nprint(res)',a:'x-y',h:'الطرف الأيسر هو x-y'},
+  {t:'code',q:'import sympy from Symbol,Eq',o:['الترتيب خاطئ: يجب from sympy import Symbol,Eq','يجب numpy','يجب import sympy فقط','لا يوجد خطأ'],a:0},
+  {t:'mc',q:'لحل x²-2y=-5, 4x-y=3\nأي جملة تعرّف المعادلة الثانية؟',o:['eq2=Eq(4x-y,3)','eq2=Eq(4*x-y,3)','eq2=Eq(4*x*y,3)','eq2=solve(4*x-y,3)'],a:1},
+  {t:'code',q:'from numpy import roots\ncof=[2,-4,3]\nsolv=roots(cof)\nprint(solv)',o:['حلول مركبة لأن المميز سالب','[1. 1.5]','[-4. 3.]','خطأ'],a:0},
+  {t:'code',q:'import sympy from Symbol,Eq\nx=symbol("x",real=True)',o:['خطآن: الترتيب خاطئ و symbol تبدأ بـ S كبيرة','فقط الترتيب خاطئ','فقط اسم الدالة خاطئ','لا يوجد خطأ'],a:0}
+]},
+3:{
+1:[
+  {t:'mc',q:'ما تعريف المصفوفة في الرياضيات؟',o:['قائمة أرقام عشوائية','بنية رياضية لتنظيم البيانات في صفوف وأعمدة','دالة رياضية','معادلة من الدرجة الثانية'],a:1},
+  {t:'mc',q:'أي مكتبة لتعريف المصفوفات في بايثون؟',o:['sympy','math','numpy','matplotlib'],a:2},
+  {t:'mc',q:'أي دالة تُستخدم لإنشاء مصفوفة في numpy؟',o:['matrix','table','array','create'],a:2},
+  {t:'mc',q:'ما الفرق بين المصفوفة الأحادية والثنائية البعد؟',o:['الأحادية أكبر','الأحادية صف واحد والثنائية صفان أو أكثر','الثنائية عمود واحد','لا فرق'],a:1},
+  {t:'mc',q:'من أي موقع يبدأ ترقيم عناصر المصفوفة في بايثون؟',o:['من 1','من 0','من -1','من 2'],a:1},
+  {t:'mc',q:'ما الكود الصحيح لإنشاء مصفوفة [1,2,3]؟',o:['x=array(1,2,3)','x=array([1,2,3])','x=matrix[1,2,3]','x=numpy(1,2,3)'],a:1},
+  {t:'mc',q:'كيف تطبع العنصر الأول في المصفوفة الأحادية x؟',o:['print(x[1])','print(x[0])','print(x.first)','print(x(0))'],a:1},
+  {t:'mc',q:'ما الكود الصحيح لقراءة عنصر الصف 0 والعمود 2 من مصفوفة ثنائية x؟',o:['print(x[2,0])','print(x[0][2])','print(x[0,2])','كلاهما ب و ج صحيح'],a:3},
+  {t:'mc',q:'ما الطريقة الصحيحة لاستيراد numpy باسم مستعار؟',o:['import np as numpy','import numpy as np','from np import numpy','numpy import as np'],a:1},
+  {t:'mc',q:'أي من التالية مصفوفة ثنائية البعد صحيحة؟',o:['x=array([1,2,3])','x=array([[1,2],[3,4]])','x=array(1,2,3,4)','x=array{[1,2],[3,4]}'],a:1}
+],
+2:[
+  {t:'mc',q:'أي دوال للعمليات الحسابية على المصفوفات في numpy؟',o:['plus, minus, times, div','add, subtract, multiply, divide','sum, diff, prod, quot','calc, math, oper, func'],a:1},
+  {t:'code',q:'from numpy import array,add\narr1=array([1,3,4])\narr2=array([5,6,7])\nprint(add(arr1,arr2))',o:['[6 9 11]','[1 3 4]','[5 6 7]','خطأ'],a:0},
+  {t:'code',q:'import numpy as np\narr1=np.array([5,10,15])\narr2=np.array([2,3,5])\nprint(arr1+arr2)',o:['[7 13 20]','[5 10 15]','خطأ','[10 30 75]'],a:0},
+  {t:'mc',q:'ما ناتج ضرب المصفوفة [2,4,6] في العدد 3؟',o:['[2,4,6]','[6,12,18]','[5,7,9]','خطأ'],a:1},
+  {t:'fill',q:'أكمل البرنامج لجمع مصفوفتين:\nfrom numpy import array,________\narr1=array([1,2,3])\narr2=array([4,5,6])\nprint(________(arr1,arr2))',a:'add',h:'دالة الجمع في numpy هي add'},
+  {t:'code',q:'import numpy as np\narr2=np.array([4,5,6])\nprint(np.multiply(arr2,3))',o:['[12 15 18]','[4 5 6]','[7 8 9]','خطأ'],a:0},
+  {t:'mc',q:'ما الدالة لطرح مصفوفتين في numpy؟',o:['minus','substract','subtract','diff'],a:2},
+  {t:'mc',q:'ما ناتج:\nimport numpy as np\narr1=np.array([1,3,4])\nprint(5+arr1)',o:['[6 8 9]','[5 5 5]','خطأ','[1 3 4]'],a:0},
+  {t:'fill',q:'أكمل البرنامج لقسمة مصفوفتين:\nfrom numpy import array,________\narr1=array([10,20,30])\narr2=array([2,4,5])\nprint(________(arr1,arr2))',a:'divide',h:'دالة القسمة في numpy هي divide'},
+  {t:'mc',q:'أي العبارتين يعطيان نفس نتيجة ضرب arr1 في 3؟',o:['multiply(arr1,3) و arr1+3','multiply(arr1,3) و arr1*3','multiply(arr1,3) و arr1/3','multiply(arr1,3) و arr1-3'],a:1}
+],
+3:[
+  {t:'mc',q:'ما الدالة لحل الأنظمة الخطية في numpy؟',o:['solve','roots','linalg.solve','linear.solve'],a:2},
+  {t:'mc',q:'كيف يجب استيراد numpy لاستخدام linalg.solve؟',o:['from numpy import linalg','import numpy as np','from numpy.linalg import solve','لا يمكن استيرادها'],a:1},
+  {t:'code',q:'import numpy as np\ncoef=np.array([[3,1],[1,-3]])\ncons=np.array([10,2])\nres=np.linalg.solve(coef,cons)\nprint(res)',o:['[3.2 0.4]','[10. 2.]','خطأ','[3. 1.]'],a:0},
+  {t:'fill',q:'أكمل لحل: x+y=-5, 2x+3y=0\nimport numpy as np\ncoef=np.array([[1,1],[2,3]])\ncons=np.array(________)\nres=np.linalg.solve(coef,cons)\nprint(res)',a:'[-5,0]',h:'مصفوفة الثوابت هي [-5,0]'},
+  {t:'mc',q:'ما الطريقة الصحيحة لكتابة مصفوفة معاملات: 5x-2y=3, -3x+4y=7 ؟',o:['np.array([5,-2,-3,4])','np.array([[5,-2],[-3,4]])','np.array([[5,3],[-3,7]])','np.array([[-2,5],[4,-3]])'],a:1},
+  {t:'code',q:'import numpy as np\ncoef=np.Array([[1,4],[1,-1]])\ncons=np.array([103,32])\nres=np.linalg.solve(coef,cons)\nprint(res)',o:['يجب np.array وليس np.Array (A كبيرة خطأ)','يجب from numpy import','cons خاطئة','لا يوجد خطأ'],a:0},
+  {t:'fill',q:'أكمل لحل: x+2y=4, 3x+y=5\nimport numpy as np\ncoef=np.array([[1,2],[3,1]])\ncons=np.array([4,5])\nres=np.________.solve(coef,cons)\nprint(res)',a:'linalg',h:'الدالة هي np.linalg.solve'},
+  {t:'code',q:'import numpy as x\ncoef=x.array([[1,4],[103,32]])\ncons=x.array([1,-1])\nresult=x.linalg.solve(cons,coef)\nprint(result)',o:['ترتيب المعاملات والثوابت في solve مقلوب يجب solve(coef,cons)','يجب import numpy as np','Array بدل array','لا يوجد خطأ'],a:0},
+  {t:'mc',q:'ما الفرق بين الأنظمة الخطية وغير الخطية؟',o:['الخطية أصعب دائماً','الخطية معادلاتها من الدرجة الأولى وغير الخطية قد تحتوي على قوى أو دوال','الخطية تستخدم sympy','لا فرق'],a:1},
+  {t:'mc',q:'سبب الخطأ في:\nimport numpy as np\ncoef=np.array([1,2],[3,4])',o:['يجب double brackets: np.array([[1,2],[3,4]])','يجب from numpy','لا يوجد خطأ','يجب linalg.array'],a:0}
+]},
+4:{
+1:[
+  {t:'mc',q:'أي مكتبتين لرسم المعادلات بيانياً في بايثون؟',o:['math و sympy','numpy و matplotlib','pandas و scipy','random و datetime'],a:1},
+  {t:'mc',q:'ما وظيفة الدالة np.linspace؟',o:['حل المعادلات','إنشاء قيم المحور السيني (نقاط متساوية المسافة)','رسم المعادلة','تعريف الرمز'],a:1},
+  {t:'mc',q:'أي دالة تُستخدم لرسم المعادلة بيانياً؟',o:['np.show','plt.plot','plt.draw','np.graph'],a:1},
+  {t:'mc',q:'أي دالة لعرض الرسم البياني؟',o:['plt.display()','plt.render()','plt.show()','np.show()'],a:2},
+  {t:'mc',q:'ما وظيفة plt.title()؟',o:['عنوان المحور السيني','عنوان المحور الصادي','عنوان الرسم البياني الكلي','لون الرسم'],a:2},
+  {t:'mc',q:'ما وظيفة plt.xlabel()؟',o:['عنوان المحور السيني','عنوان المحور الصادي','عنوان الرسم','خطوط الشبكة'],a:0},
+  {t:'mc',q:'ما وظيفة plt.grid()؟',o:['رسم المعادلة','عرض الرسم','إضافة خطوط الشبكة','تعيين عنوان'],a:2},
+  {t:'mc',q:'الطريقة الصحيحة لاستيراد matplotlib للرسم:',o:['import matplotlib','import matplotlib.pyplot','import matplotlib.pyplot as plt','from matplotlib import plot'],a:2},
+  {t:'mc',q:'الطريقة الصحيحة لإنشاء محور سيني بين 10 و30:',o:['x=np.linspace(30,10)','x=np.linspace(10,30)','x=linspace(10,30)','x=np.Linspace(10,30)'],a:1},
+  {t:'mc',q:'دالة linspace تنتمي لأي مكتبة؟',o:['matplotlib','sympy','math','numpy'],a:3}
+],
+2:[
+  {t:'code',q:'import numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(-50,50,400)\nequ=x**2+7*x-120\nplt.plot(x,equ)\nplt.show()',o:['يرسم منحنى المعادلة x²+7x-120','يطبع قيماً عددية','خطأ في الكود','يرسم خطاً مستقيماً'],a:0},
+  {t:'fill',q:'أكمل لرسم f(x)=|7x-50|-2:\nimport numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(-50,50,400)\nequ=________(7*x-50)-2\nplt.plot(x,equ)\nplt.show()',a:'abs',h:'دالة القيمة المطلقة في بايثون'},
+  {t:'mc',q:'ما وظيفة plt.ylabel()؟',o:['عنوان المحور السيني','عنوان المحور الصادي','عنوان الرسم البياني','خطوط الشبكة'],a:1},
+  {t:'mc',q:'ما الرقم 400 في np.linspace(-50,50,400)؟',o:['قيمة البداية','قيمة النهاية','عدد النقاط المتولدة','درجة الدقة'],a:2},
+  {t:'code',q:'import numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(10,30)\nequ=abs(x+1)\nplt.plot(x,equ)\nplt.title("My plot")\nplt.grid(False)\nplt.show()',o:['يرسم |x+1| بدون خطوط شبكة وبعنوان My plot','يرسم |x+1| مع خطوط شبكة','خطأ في الكود','لا يرسم شيئاً'],a:0},
+  {t:'fill',q:'أكمل الكود لكتابة عنوان للمحور الصادي "Values":\nplt.______("Values")',a:'ylabel',h:'دالة عنوان المحور الصادي'},
+  {t:'mc',q:'ما الفرق بين plt.grid(True) و plt.grid(False)؟',o:['لا فرق','True يظهر خطوط الشبكة وFalse يخفيها','True بألوان وFalse بالأبيض','True يحفظ الصورة وFalse يعرضها'],a:1},
+  {t:'mc',q:'الخطوات الإلزامية لرسم معادلة بيانياً:',o:['استيراد المكتبات فقط','استيراد + linspace + تعريف المعادلة + plot + show','title + xlabel + ylabel + grid فقط','plt.plot() فقط'],a:1},
+  {t:'fill',q:'أكمل الكود لرسم 3x²+2x+2 مع خطوط شبكة:\nimport numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(10,50)\nque=3*x**2+2*x+2\nplt.________(x,que)\nplt.grid(True)\nplt.show()',a:'plot',h:'دالة الرسم في matplotlib'},
+  {t:'mc',q:'هل دوال تنسيق الرسم (title, xlabel, ylabel, grid) إلزامية؟',o:['نعم كلها','لا، اختيارية حسب المطلوب','نعم فقط title','لا، plt.show() وحدها كافية'],a:1}
+],
+3:[
+  {t:'code',q:'import numpy as np\nimport plt as matplotlib.pyplot\nx=np.linspace(-50,50,400)\nequ=2*x**2+4*x+16\nplt.plot(equ,x)\nplt.label("Equation Title")\nplt.grid("True")\nplt.show()',o:['أخطاء متعددة: ترتيب الاستيراد خاطئ، plot يجب (x,equ)، لا توجد plt.label، grid تأخذ True وليس "True"','خطأ واحد فقط في الاستيراد','لا يوجد خطأ','خطأ في linspace فقط'],a:0},
+  {t:'fill',q:'صحح طريقة استيراد matplotlib:\nimport ________ as plt',a:'matplotlib.pyplot',h:'الاستيراد الصحيح: import matplotlib.pyplot as plt'},
+  {t:'mc',q:'سبب الخطأ في: plt.plot(equ,x) لرسم المعادلة equ=x**2',o:['يجب plt.plot(x,equ) بحيث x أولاً','equ غير معرّف','يجب np.plot','لا يوجد خطأ'],a:0},
+  {t:'code',q:'import numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(-50,50,400)\nequ=2*x**2+4*x+16\nplt.plot(x,equ)\nplt.title("Equation 1")\nplt.grid(True)\nplt.show()',o:['يرسم المعادلة بعنوان Equation 1 مع خطوط شبكة','يطبع قيماً عددية','خطأ لأن title تأتي قبل plot','خطأ في المعادلة'],a:0},
+  {t:'fill',q:'صحح الكود لرسم f(x)=x²+7x-120:\nimport numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(-50,50,400)\nequ=x**2+7*x-120\nplt.________(x,equ)\nplt.show()',a:'plot',h:'دالة الرسم هي plt.plot'},
+  {t:'mc',q:'عند رسم |7x-50|-2 يكون شكل الرسم:',o:['منحنى أملس (قطع مكافئ)','شكل حرف V','خط مستقيم','دائرة'],a:1},
+  {t:'mc',q:'ما الغرض من تحديد عدد النقاط في linspace مثل 400؟',o:['يحدد عرض الصورة','يحدد الارتفاع','يجعل المنحنى أكثر نعومة وتفصيلاً','يحدد لون الرسم'],a:2},
+  {t:'fill',q:'أكمل البرنامج لرسم f(x)=3x²+2x+2 مع عنوان "Quadratic":\nimport numpy as np\nimport matplotlib.pyplot as plt\nx=np.linspace(10,50)\nque=3*x**2+2*x+2\nplt.plot(x,que)\nplt.______("Quadratic")\nplt.grid(True)\nplt.show()',a:'title',h:'دالة تعيين عنوان الرسم'},
+  {t:'mc',q:'لرسم دالتين على نفس الرسم البياني:',o:['يجب رسمين منفصلين','نكتب سطرين من plt.plot قبل plt.show()','مستحيل في matplotlib','نضع المعادلتين في نفس المتغير'],a:1},
+  {t:'code',q:'import numpy as np\nimport matplotlib.pyplot as plt\nx=np.Linspace(-50,50,400)\nequ=x**2\nplt.plot(x,equ)\nplt.show()',o:['يجب np.linspace بحرف L صغير','يجب from numpy import','equ خاطئة','لا يوجد خطأ'],a:0}
+]}
+};
+
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function submitInfo(){var n=document.getElementById('stName').value.trim(),s=document.getElementById('stSchool').value.trim(),g=document.getElementById('stGrade').value.trim();if(!n||!s||!g){alert('يرجى تعبئة جميع الحقول');return;}ST={name:n,school:s,grade:g};goTo('s2');}
+function selectUnit(u){CU=u;[1,2,3,4].forEach(function(i){var el=document.getElementById('uc'+i);el.classList.remove('selected');});document.getElementById('uc'+u).classList.add('selected');}
+function startQuiz(lvl){CL=lvl;CQS=QDB[CU][lvl];CI=0;SC=0;ANS=false;var uN={1:'الوحدة الأولى — المكتبات',2:'الوحدة الثانية — المعادلات',3:'الوحدة الثالثة — المصفوفات',4:'الوحدة الرابعة — الرسم البياني'};var lN={1:'المستوى الأول ⭐',2:'المستوى الثاني ⭐⭐',3:'المستوى الثالث ⭐⭐⭐'};document.getElementById('quizTitleEl').textContent=uN[CU]+' | '+lN[lvl];document.getElementById('quizBread').innerHTML='الرئيسية / اختيار <span>/ '+uN[CU]+'</span>';renderQ();goTo('s3');}
+function renderQ(){var q=CQS[CI];ANS=false;document.getElementById('qCountEl').textContent='السؤال '+(CI+1)+' من '+CQS.length;document.getElementById('progBar').style.width=(CI/CQS.length*100)+'%';document.getElementById('checkBtn').style.display='none';document.getElementById('nextBtn').style.display='none';var html='';if(q.t==='mc'){html+='<div class="q-text">'+q.q.replace(/\n/g,'<br>')+'</div>';html+='<div class="options">';q.o.forEach(function(o,i){html+='<button class="option" id="op'+i+'" onclick="selOpt('+i+')">'+o+'</button>';});html+='</div>';}else if(q.t==='code'){html+='<p style="font-size:13px;color:var(--gray-500);margin-bottom:7px">ما سبب الخطأ أو ما ناتج تنفيذ البرنامج؟</p>';html+='<div class="code-block">'+fmtCode(q.q)+'</div>';html+='<div class="options">';q.o.forEach(function(o,i){html+='<button class="option" id="op'+i+'" onclick="selOpt('+i+')">'+o+'</button>';});html+='</div>';}else{html+='<div class="q-text">أكمل الفراغ في البرنامج التالي:</div>';html+='<div class="code-block" style="margin-bottom:11px">'+fmtCode(q.q)+'</div>';html+='<input type="text" class="fill-input" id="fillIn" placeholder="اكتب إجابتك (بالإنجليزية)...">';if(q.h)html+='<div class="hint-box" id="hintBox">💡 '+q.h+'</div>';document.getElementById('checkBtn').style.display='inline-flex';}html+='<div class="feedback" id="fb"></div>';document.getElementById('questionArea').innerHTML=html;if(q.t==='fill'){var fi=document.getElementById('fillIn');fi.addEventListener('keypress',function(e){if(e.key==='Enter')checkAnswer();});fi.focus();if(q.h){var hb=document.createElement('button');hb.className='btn';hb.style.marginRight='6px';hb.textContent='💡 تلميح';hb.onclick=function(){var hx=document.getElementById('hintBox');if(hx)hx.className='hint-box show';};document.querySelector('.quiz-actions').insertBefore(hb,document.getElementById('checkBtn'));}}}
+function fmtCode(s){var out=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');['import','from','print','as','True','False'].forEach(function(k){out=out.replace(new RegExp('\\b'+k+'\\b','g'),'<span class="kw">'+k+'</span>');});out=out.replace(/(["'])([^"']*)\1/g,'<span class="sv">$1$2$1</span>');out=out.replace(/#([^\n]*)/g,'<span class="cm">#$1</span>');return out;}
+function selOpt(i){if(ANS)return;ANS=true;var q=CQS[CI];document.querySelectorAll('.option').forEach(function(o){o.classList.add('disabled');});var fb=document.getElementById('fb');if(i===q.a){SC++;document.getElementById('op'+i).classList.add('correct');fb.innerHTML='✓ إجابة صحيحة!';fb.className='feedback show ok';}else{document.getElementById('op'+i).classList.add('wrong');document.getElementById('op'+q.a).classList.add('correct');fb.innerHTML='✗ الإجابة الصحيحة: <strong>'+q.o[q.a]+'</strong>';fb.className='feedback show err';}document.getElementById('nextBtn').style.display='inline-flex';}
+function checkAnswer(){if(ANS)return;ANS=true;var q=CQS[CI];var val=(document.getElementById('fillIn').value||'').trim();var fi=document.getElementById('fillIn');fi.disabled=true;var fb=document.getElementById('fb');var nv=val.replace(/\s/g,'').toLowerCase(),na=q.a.replace(/\s/g,'').toLowerCase();if(nv===na){SC++;fi.classList.add('correct');fb.innerHTML='✓ إجابة صحيحة!';fb.className='feedback show ok';}else{fi.classList.add('wrong');fb.innerHTML='✗ الإجابة الصحيحة: <code style="background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px;font-family:var(--mono)">'+q.a+'</code>';fb.className='feedback show err';}document.getElementById('checkBtn').style.display='none';document.getElementById('nextBtn').style.display='inline-flex';var hx=document.getElementById('hintBox');if(hx)hx.className='hint-box';}
+function nextQ(){document.querySelectorAll('.quiz-actions .btn').forEach(function(b){if(b.textContent.includes('تلميح'))b.remove();});CI++;if(CI>=CQS.length)showResults();else renderQ();}
+function showResults(){document.getElementById('progBar').style.width='100%';var pct=Math.round(SC/CQS.length*100),passed=pct>=60;document.getElementById('scoreNum').textContent=SC+'/'+CQS.length;document.getElementById('scorePct').textContent='النسبة: '+pct+'%';var rb=document.getElementById('resultBadge');if(passed){rb.textContent='مبروك! لقد اجتزت الاختبار ✓';rb.className='result-badge result-pass';}else{rb.textContent='لم تجتز الاختبار — تحتاج 60% للنجاح';rb.className='result-badge result-fail';}document.getElementById('certBtn').style.display=passed?'inline-flex':'none';goTo('s4');}
+function retryQuiz(){CI=0;SC=0;ANS=false;renderQ();goTo('s3');}
+function showCert(){var uN={1:'الوحدة الأولى — توظيف المكتبات في لغة البايثون',2:'الوحدة الثانية — حل المعادلات بلغة البايثون',3:'الوحدة الثالثة — المصفوفات بلغة البايثون',4:'الوحدة الرابعة — رسم المعادلات بيانياً'};var lN={1:'المستوى الأول ⭐',2:'المستوى الثاني ⭐⭐',3:'المستوى الثالث ⭐⭐⭐'};var stars={1:'⭐',2:'⭐⭐',3:'⭐⭐⭐'};document.getElementById('cName').textContent=ST.name;document.getElementById('cSchoolEl').textContent='المدرسة: '+ST.school;document.getElementById('cGradeEl').textContent='الصف: '+ST.grade;document.getElementById('cUnit').textContent=uN[CU];document.getElementById('cLevel').textContent=lN[CL];document.getElementById('cStars').textContent=stars[CL];document.getElementById('cScore').textContent='النتيجة: '+SC+'/'+CQS.length+' — '+Math.round(SC/CQS.length*100)+'%';var d=new Date();document.getElementById('cDate').textContent=d.toLocaleDateString('ar-BH',{year:'numeric',month:'long',day:'numeric'});goTo('s5');}
+</script>
+</body>
+</html>
