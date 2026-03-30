@@ -255,332 +255,282 @@ const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 function dayName(y,m,d){const ds=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];return ds[new Date(y,m-1,d).getDay()];}
 
 /* ---- DYNAMIC QUESTION GENERATORS ---- */
-// Each generator returns a fresh question object {t,q,c,o,a,e} on every call
+function makeGenerators(lvl){
+  const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DN=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
-const QGEN={
-easy:[
-  // Q1 - datetime: date.today()
+  const easy=[
+  ()=>({t:"datetime",q:"أكمل الفراغ: لطباعة تاريخ اليوم فقط نكتب:",
+    c:"from datetime import date\nprint( date. __________ )",
+    o:["date.now()","date.today()","date.current()","date.time()"],a:1,
+    e:"الدالة الصحيحة هي date.today() لعرض تاريخ اليوم فقط دون الوقت."}),
   ()=>{
-    return{t:"datetime",q:"أكمل الفراغ: لطباعة تاريخ اليوم فقط نكتب:",
-      c:"from datetime import date\nprint( date. __________ )",
-      o:["date.now()","date.today()","date.current()","date.time()"],a:1,
-      e:"الدالة الصحيحة هي date.today() لعرض تاريخ اليوم فقط دون الوقت."};
-  },
-  // Q2 - datetime: date(y,m,d) output format — randomise year/month/day
-  ()=>{
-    const y=rnd(2000,2015), m=rnd(1,12), d=rnd(1,28);
-    const ms=String(m).padStart(2,'0'), ds=String(d).padStart(2,'0');
-    const correct=`${y}-${ms}-${ds} is my birthday`;
-    const {o,a}=mkOpts(correct,[`is my birthday ${y}-${ms}-${ds}`,`${ds}/${ms}/${y} is my birthday`,`خطأ في الكود`]);
+    const y=rnd(2000,2015),m=rnd(1,12),d=rnd(1,28);
+    const ms=String(m).padStart(2,"0"),ds=String(d).padStart(2,"0");
+    const correct=y+"-"+ms+"-"+ds+" is my birthday";
+    const r=mkOpts(correct,["is my birthday "+y+"-"+ms+"-"+ds,ds+"/"+ms+"/"+y+" is my birthday","خطأ في الكود"]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nBD = date(${y}, ${m}, ${d})\nprint(BD, "is my birthday")`,
-      o,a,e:`date(${y},${m},${d}) تُنشئ تاريخاً بالصيغة YYYY-MM-DD، فيطبع: ${correct}`};
+      c:"from datetime import date\nBD = date("+y+", "+m+", "+d+")\nprint(BD, \"is my birthday\")",
+      o:r.o,a:r.a,e:"date("+y+","+m+","+d+") تُنشئ تاريخاً بالصيغة YYYY-MM-DD، فيطبع: "+correct};
   },
-  // Q3 - datetime: .year .month .day — randomise which attribute
   ()=>{
-    const y=rnd(2000,2023), m=rnd(1,12), d=rnd(1,28);
-    const attr=randPick(['year','month','day']);
-    const val=attr==='year'?y:attr==='month'?m:d;
-    const ms=String(m).padStart(2,'0'), ds=String(d).padStart(2,'0');
-    const arAttr=attr==='year'?'السنة':attr==='month'?'الشهر':'اليوم';
-    const {o,a}=mkOpts(String(val),[`${y}-${ms}-${ds}`,String(attr==='year'?m:attr==='month'?y:m),String(val+1)]);
+    const y=rnd(2000,2023),m=rnd(1,12),d=rnd(1,28);
+    const attr=randPick(["year","month","day"]);
+    const val=attr==="year"?y:attr==="month"?m:d;
+    const ms=String(m).padStart(2,"0"),ds=String(d).padStart(2,"0");
+    const arAttr=attr==="year"?"السنة":attr==="month"?"الشهر":"اليوم";
+    const r=mkOpts(String(val),[y+"-"+ms+"-"+ds,String(attr==="year"?m:attr==="month"?y:m),String(val+1)]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nx = date(${y}, ${m}, ${d})\nprint( x.${attr} )`,
-      o,a,e:`الخاصية .${attr} تُرجع ${arAttr} فقط من التاريخ. القيمة هي ${val}.`};
+      c:"from datetime import date\nx = date("+y+", "+m+", "+d+")\nprint( x."+attr+" )",
+      o:r.o,a:r.a,e:"الخاصية ."+attr+" تُرجع "+arAttr+" فقط من التاريخ. القيمة هي "+val+"."};
   },
-  // Q4 - datetime: strftime %A — randomise date
   ()=>{
-    const dates=[[2026,2,1,"Sunday"],[2025,1,1,"Wednesday"],[2024,3,1,"Friday"],[2023,7,4,"Tuesday"],[2022,11,20,"Sunday"]];
-    const [y,m,d,dn]=randPick(dates);
-    const mn=MONTHS[m-1];
-    const {o,a}=mkOpts(dn,[mn,String(y),String(d).padStart(2,'0')]);
+    const rows=[[2026,2,1,"Sunday"],[2025,1,1,"Wednesday"],[2024,3,1,"Friday"],[2023,7,4,"Tuesday"],[2022,11,20,"Sunday"]];
+    const row=randPick(rows);const y=row[0],m=row[1],d=row[2],dn=row[3];
+    const mn=MN[m-1];
+    const r=mkOpts(dn,[mn,String(y),String(d).padStart(2,"0")]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nx = date(${y}, ${m}, ${d})\nprint( x.strftime("%A") )`,
-      o,a,e:`%A في strftime تعطي اسم اليوم بالإنجليزية. ${d}/${m}/${y} كان يوم ${dn}.`};
+      c:"from datetime import date\nx = date("+y+", "+m+", "+d+")\nprint( x.strftime(\"%A\") )",
+      o:r.o,a:r.a,e:"%A في strftime تعطي اسم اليوم بالإنجليزية. "+d+"/"+m+"/"+y+" كان يوم "+dn+"."};
   },
-  // Q5 - random: randint boundaries — randomise a,b
   ()=>{
-    const a=rnd(2,15), b=a+rnd(3,8);
-    const correct=`${a} إلى ${b} شاملاً الحدين`;
-    const {o,a:ans}=mkOpts(correct,[`${a} إلى ${b-1} فقط`,`${a+1} إلى ${b-1} فقط`,`رقم عشري بين ${a} و ${b}`]);
+    const a=rnd(2,15),b=a+rnd(3,8);
+    const correct=a+" إلى "+b+" شاملاً الحدين";
+    const r=mkOpts(correct,[a+" إلى "+(b-1)+" فقط",(a+1)+" إلى "+(b-1)+" فقط","رقم عشري بين "+a+" و "+b]);
     return{t:"random",q:"ما نطاق الأرقام الممكنة لهذا الكود؟",
-      c:`import random\nx = random.randint(${a}, ${b})\nprint(x)`,
-      o,a:ans,e:`randint(${a},${b}) يشمل الحدين، فالأرقام الممكنة من ${a} حتى ${b}.`};
+      c:"import random\nx = random.randint("+a+", "+b+")\nprint(x)",
+      o:r.o,a:r.a,e:"randint("+a+","+b+") يشمل الحدين، فالأرقام الممكنة من "+a+" حتى "+b+"."};
   },
-  // Q6 - random: randint with variable — randomise x and add value
   ()=>{
-    const x=rnd(5,20), add=rnd(2,6), y=x+add;
-    const {o,a}=mkOpts(`بين ${x} و ${y}`,[ `بين 0 و ${x}`,`بين ${x} و ${add}`,`بين ${add} و ${y}`]);
+    const x=rnd(5,20),add=rnd(2,6),y=x+add;
+    const r=mkOpts("بين "+x+" و "+y,["بين 0 و "+x,"بين "+x+" و "+add,"بين "+add+" و "+y]);
     return{t:"random",q:"ما نطاق الأرقام العشوائية الممكنة لـ z ؟",
-      c:`import random\nx = ${x}\ny = x + ${add}\nz = random.randint(x, y)\nprint(z)`,
-      o,a,e:`x=${x} و y=x+${add}=${y}، لذا randint(x,y) يعطي أرقاماً بين ${x} و ${y} شاملاً.`};
+      c:"import random\nx = "+x+"\ny = x + "+add+"\nz = random.randint(x, y)\nprint(z)",
+      o:r.o,a:r.a,e:"x="+x+" و y=x+"+add+"="+y+"، لذا randint(x,y) يعطي أرقاماً بين "+x+" و "+y+" شاملاً."};
   },
-  // Q7 - random: randrange(n) last possible — randomise n
   ()=>{
     const n=rnd(3,9);
-    const {o,a}=mkOpts(String(n-1),[String(n),String(n-2),"0"]);
+    const r=mkOpts(String(n-1),[String(n),String(n-2),"0"]);
     return{t:"random",q:"ما آخر عدد عشوائي ممكن لهذا الكود؟",
-      c:`import random\nx = random.randrange(${n})\nprint(x)`,
-      o,a,e:`randrange(${n}) يعطي أرقاماً من 0 إلى ${n-1} فقط (لا تشمل ${n}). آخر رقم ممكن هو ${n-1}.`};
+      c:"import random\nx = random.randrange("+n+")\nprint(x)",
+      o:r.o,a:r.a,e:"randrange("+n+") يعطي أرقاماً من 0 إلى "+(n-1)+" فقط (لا تشمل "+n+"). آخر رقم ممكن هو "+(n-1)+"."};
   },
-  // Q8 - if/else simple comparison — randomise value and threshold
   ()=>{
     const threshold=randPick([40,50,60,70,80]);
-    const val=randPick([threshold+rnd(5,20), threshold-rnd(5,20)]);
+    const delta=rnd(5,20);
+    const val=rnd(0,1)===0?threshold+delta:threshold-delta;
     const passes=val>threshold;
     const correct=passes?"pass":"fail";
-    const {o,a}=mkOpts(correct,[passes?"fail":"pass",String(val),"خطأ"]);
+    const r=mkOpts(correct,[passes?"fail":"pass",String(val),"خطأ"]);
     return{t:"if / else",q:"ما ناتج هذا الكود؟",
-      c:`degree = ${val}\nif degree > ${threshold}:\n    print("pass")\nelse:\n    print("fail")`,
-      o,a,e:`${val} ${passes?'أكبر':'ليس أكبر'} من ${threshold}، لذا يطبع ${correct}.`};
+      c:"degree = "+val+"\nif degree > "+threshold+":\n    print(\"pass\")\nelse:\n    print(\"fail\")",
+      o:r.o,a:r.a,e:val+(passes?" أكبر":" ليس أكبر")+" من "+threshold+"، لذا يطبع "+correct+"."};
   },
-  // Q9 - for in list: count iterations — randomise list
   ()=>{
     const pools=[["Bahrain","Kuwait","KSA","UAE","Qatar","Oman"],["apple","banana","mango","grape"],["red","blue","green","yellow","white"],["Python","Java","C++"]];
-    const lst=randPick(pools);
-    const n=lst.length;
-    const correct=`يطبع كل عنصر في سطر منفصل (${n} أسطر)`;
-    const {o,a}=mkOpts(correct,[`يطبع كل العناصر في سطر واحد`,`يطبع "${lst[0]}" فقط`,`يطبع خطأ`]);
+    const lst=randPick(pools);const n=lst.length;
+    const correct="يطبع كل عنصر في سطر منفصل ("+n+" أسطر)";
+    const r=mkOpts(correct,["يطبع كل العناصر في سطر واحد","يطبع \""+lst[0]+"\" فقط","يطبع خطأ"]);
     return{t:"for in list",q:"ما ناتج هذا الكود؟",
-      c:`lst = ${JSON.stringify(lst)}\nfor i in lst:\n    print(i)`,
-      o,a,e:`حلقة for in list تطبع كل عنصر في سطر منفصل. القائمة تحتوي ${n} عناصر فتُطبع ${n} أسطر.`};
+      c:"lst = "+JSON.stringify(lst)+"\nfor i in lst:\n    print(i)",
+      o:r.o,a:r.a,e:"حلقة for in list تطبع كل عنصر في سطر منفصل. القائمة تحتوي "+n+" عناصر فتُطبع "+n+" أسطر."};
   },
-  // Q10 - for in string: count chars — randomise word
   ()=>{
     const words=["Bahrain","Kuwait","Manama","Python","school","random","Hello"];
-    const w=randPick(words);
-    const n=w.length;
-    const {o,a}=mkOpts(`${n} أسطر`,[`${n-1} أسطر`,`${n+1} أسطر`,"سطر واحد"]);
+    const w=randPick(words);const n=w.length;
+    const r=mkOpts(n+" أسطر",[(n-1)+" أسطر",(n+1)+" أسطر","سطر واحد"]);
     return{t:"for in string",q:"كم سطراً يطبع هذا الكود؟",
-      c:`for i in "${w}":\n    print(i)`,
-      o,a,e:`كلمة "${w}" تحتوي على ${n} أحرف، فتطبع ${n} أسطر كل منها حرف واحد.`};
-  }
-],
+      c:"for i in \""+w+"\": \n    print(i)",
+      o:r.o,a:r.a,e:"كلمة \""+w+"\" تحتوي على "+n+" أحرف، فتطبع "+n+" أسطر كل منها حرف واحد."};
+  }];
 
-medium:[
-  // Q1 - datetime: strftime %B — randomise date
+  const medium=[
   ()=>{
-    const m=rnd(1,12), y=rnd(2010,2026), d=rnd(1,28);
-    const mn=MONTHS[m-1];
-    const {o,a}=mkOpts(mn,[String(y),String(d).padStart(2,'0'),DAYS[rnd(0,6)]]);
+    const m=rnd(1,12),y=rnd(2010,2026),d=rnd(1,28);
+    const mn=MN[m-1];
+    const r=mkOpts(mn,[String(y),String(d).padStart(2,"0"),DN[rnd(0,6)]]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nx = date(${y}, ${m}, ${d})\nprint( x.strftime("%B") )`,
-      o,a,e:`%B في strftime تعطي اسم الشهر بالإنجليزية. الشهر ${m} هو ${mn}.`};
+      c:"from datetime import date\nx = date("+y+", "+m+", "+d+")\nprint( x.strftime(\"%B\") )",
+      o:r.o,a:r.a,e:"%B في strftime تعطي اسم الشهر بالإنجليزية. الشهر "+m+" هو "+mn+"."};
   },
-  // Q2 - datetime: .month attribute — randomise date
   ()=>{
-    const y=rnd(1995,2020), m=rnd(1,12), d=rnd(1,28);
-    const {o,a}=mkOpts(String(m),[String(y),String(d),MONTHS[m-1]]);
+    const y=rnd(1995,2020),m=rnd(1,12),d=rnd(1,28);
+    const r=mkOpts(String(m),[String(y),String(d),MN[m-1]]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nA = date(${y}, ${m}, ${d})\nprint(A.month)`,
-      o,a,e:`الخاصية .month تُرجع رقم الشهر فقط. الشهر في التاريخ هو ${m}.`};
+      c:"from datetime import date\nA = date("+y+", "+m+", "+d+")\nprint(A.month)",
+      o:r.o,a:r.a,e:"الخاصية .month تُرجع رقم الشهر فقط. الشهر في التاريخ هو "+m+"."};
   },
-  // Q3 - random: randrange(a,b) no step — randomise
   ()=>{
-    const a=rnd(5,20), b=a+rnd(2,4);
-    const possibles=[];for(let i=a;i<b;i++)possibles.push(i);
-    const correct=possibles.join(' أو ');
-    const wrong1=possibles.join(' أو ')+' أو '+b;
-    const wrong2=possibles.slice(1).join(' أو ')||String(a+1);
-    const {o,a:ans}=mkOpts(correct,[wrong1,wrong2,`${a} فقط`]);
+    const a=rnd(5,20),b=a+rnd(2,4);
+    const poss=[];for(let i=a;i<b;i++)poss.push(i);
+    const correct=poss.join(" أو ");
+    const r=mkOpts(correct,[poss.join(" أو ")+" أو "+b,poss.length>1?poss.slice(1).join(" أو "):(a+1)+"",a+" فقط"]);
     return{t:"random",q:"ما الأرقام الممكنة لهذا الكود؟",
-      c:`import random\nx = random.randrange(${a}, ${b})\nprint(x)`,
-      o,a:ans,e:`randrange(${a},${b}) لا تشمل ${b}، فالأرقام الممكنة هي: ${correct}.`};
+      c:"import random\nx = random.randrange("+a+", "+b+")\nprint(x)",
+      o:r.o,a:r.a,e:"randrange("+a+","+b+") لا تشمل "+b+"، فالأرقام الممكنة هي: "+correct+"."};
   },
-  // Q4 - random: randrange(a,b,step) — randomise
   ()=>{
-    const steps=[2,3,5];const step=randPick(steps);
-    const a=randPick([0,2,3,5]);const b=a+step*rnd(3,6);
-    const possibles=[];for(let i=a;i<b;i+=step)possibles.push(i);
-    const correct=possibles.join('-');
-    const withEnd=[...possibles,b].join('-');
-    const {o,a:ans}=mkOpts(correct,[withEnd,possibles.slice(1).join('-')||'0',`${a+1}-${a+1+step}`]);
+    const step=randPick([2,3,5]);const a=randPick([0,2,3,5]);const b=a+step*rnd(3,6);
+    const poss=[];for(let i=a;i<b;i+=step)poss.push(i);
+    const correct=poss.join("-");
+    const r=mkOpts(correct,[[...poss,b].join("-"),poss.length>1?poss.slice(1).join("-"):"1",(a+1)+"-"+(a+1+step)]);
     return{t:"random",q:"ما الأرقام الممكنة لهذا الكود؟",
-      c:`import random\nx = random.randrange(${a}, ${b}, ${step})\nprint(x)`,
-      o,a:ans,e:`randrange(${a},${b},${step}) يبدأ من ${a} بخطوة ${step} ولا يشمل ${b}: الأرقام هي ${correct}.`};
+      c:"import random\nx = random.randrange("+a+", "+b+", "+step+")\nprint(x)",
+      o:r.o,a:r.a,e:"randrange("+a+","+b+","+step+") يبدأ من "+a+" بخطوة "+step+" ولا يشمل "+b+": الأرقام هي "+correct+"."};
   },
-  // Q5 - if/elif/else grade — randomise grade value
   ()=>{
-    const configs=[[92,"A student",90],[85,"B student",80],[75,"C student",70],[55,"need more effort!",0]];
-    const [grade,result]=randPick(configs);
-    const allResults=["A student","B student","C student","need more effort!"];
-    const wrongs=allResults.filter(x=>x!==result);
-    const {o,a}=mkOpts(result,wrongs);
+    const rows=[[92,"A student"],[85,"B student"],[75,"C student"],[55,"need more effort!"]];
+    const row=randPick(rows);const grade=row[0],result=row[1];
+    const wrongs=["A student","B student","C student","need more effort!"].filter(x=>x!==result);
+    const r=mkOpts(result,wrongs);
     return{t:"if / else",q:"ما ناتج هذا الكود؟",
-      c:`grade = ${grade}\nif grade >= 90:\n    print("A student")\nelif grade >= 80:\n    print("B student")\nelif grade >= 70:\n    print("C student")\nelse:\n    print("need more effort!")`,
-      o,a,e:`grade=${grade} → يتحقق الشرط المناسب فيطبع: ${result}.`};
+      c:"grade = "+grade+"\nif grade >= 90:\n    print(\"A student\")\nelif grade >= 80:\n    print(\"B student\")\nelif grade >= 70:\n    print(\"C student\")\nelse:\n    print(\"need more effort!\")",
+      o:r.o,a:r.a,e:"grade="+grade+" → يتحقق الشرط المناسب فيطبع: "+result+"."};
   },
-  // Q6 - if/elif/else price discount — randomise price
   ()=>{
-    const scenarios=[[7,7,0.0,"price < 10"],[12,+(12-12*0.1).toFixed(1),0.1,"price < 15"],[18,+(18-18*0.2).toFixed(1),0.2,"else"]];
-    const [price,result,disc,reason]=randPick(scenarios);
-    const {o,a}=mkOpts(String(result),[String(price),String(+(price-price*0.3).toFixed(1)),"خطأ برمجي"]);
+    const rows=[[7,7,"price < 10"],[12,+(12-12*0.1).toFixed(1),"price < 15"],[18,+(18-18*0.2).toFixed(1),"else"]];
+    const row=randPick(rows);const price=row[0],result=row[1],reason=row[2];
+    const r=mkOpts(String(result),[String(price),String(+(price-price*0.3).toFixed(1)),"خطأ برمجي"]);
     return{t:"if / else",q:"ما ناتج هذا الكود؟",
-      c:`price = ${price}\nif price < 10:\n    print(price)\nelif price < 15:\n    print(price - (price * 0.1))\nelse:\n    print(price - (price * 0.2))`,
-      o,a,e:`price=${price} → يتحقق شرط (${reason})، فيطبع ${result}.`};
+      c:"price = "+price+"\nif price < 10:\n    print(price)\nelif price < 15:\n    print(price - (price * 0.1))\nelse:\n    print(price - (price * 0.2))",
+      o:r.o,a:r.a,e:"price="+price+" → يتحقق شرط ("+reason+")، فيطبع "+result+"."};
   },
-  // Q7 - for in list with if condition — randomise list and threshold
   ()=>{
     const thresh=randPick([5,8,10,12]);
-    const n1=thresh+rnd(3,10), n2=thresh-rnd(1,4), n3=thresh+rnd(1,5), n4=thresh-rnd(2,thresh-1);
+    const n1=thresh+rnd(3,10),n2=thresh-rnd(1,4),n3=thresh+rnd(1,5),n4=Math.max(1,thresh-rnd(2,thresh-1));
     const lst=[n1,n2,n3,n4];
     const add=randPick([2,3,5]);
-    const results=lst.filter(x=>x>thresh).map(x=>x+add);
-    const correct=results.join(' ثم ');
-    const all=lst.map(x=>x+add).join(' ثم ');
-    const filteredAbove=lst.filter(x=>x>thresh);
-    const filteredBelow=lst.filter(x=>x<=thresh);
-    const d1=lst.map(x=>x+add).join(' ثم ');
-    const d2=filteredAbove.length?filteredAbove.join(' ثم '):'لا يوجد ناتج';
-    const d3=filteredBelow.length?filteredBelow.join(' ثم '):'لا يوجد ناتج';
-    const {o,a}=mkOpts(correct,[d1,d2,d3]);
+    const above=lst.filter(x=>x>thresh);
+    const correct=above.map(x=>x+add).join(" ثم ");
+    const d1=lst.map(x=>x+add).join(" ثم ");
+    const d2=above.length?above.join(" ثم "):"لا يوجد";
+    const d3=lst.filter(x=>x<=thresh).join(" ثم ")||"لا يوجد";
+    const r=mkOpts(correct,[d1,d2,d3]);
     return{t:"for in list",q:"ما ناتج هذا الكود؟",
-      c:`A = ${JSON.stringify(lst)}\nfor i in A:\n    if i > ${thresh}:\n        print(i + ${add})`,
-      o,a,e:`الأرقام الأكبر من ${thresh} هي: ${lst.filter(x=>x>thresh).join(',')} ويُضاف لها ${add}، فالناتج: ${correct}.`};
+      c:"A = "+JSON.stringify(lst)+"\nfor i in A:\n    if i > "+thresh+":\n        print(i + "+add+")",
+      o:r.o,a:r.a,e:"الأرقام الأكبر من "+thresh+" هي: "+above.join(",")+" ويُضاف لها "+add+"، فالناتج: "+correct+"."};
   },
-  // Q8 - for in list with if/else divide — randomise base and divisor
   ()=>{
-    const div=randPick([2,3,4]);
-    const base=div*rnd(2,5);
-    const lst=[base, base*2, base*3, base*4];
-    const thresh=base;
-    const results=lst.map(x=>x===thresh?String(x):String(+(x/div)));
-    const correct=results.join(' ثم ');
-    const {o,a}=mkOpts(correct,[lst.map(x=>String(+(x/div))).join(' ثم '),lst.join(' ثم '),results.slice(1).join(' ثم ')]);
+    const div=randPick([2,3,4]);const base=div*rnd(2,5);
+    const lst=[base,base*2,base*3,base*4];
+    const results=lst.map(x=>x===base?String(x):String(+(x/div)));
+    const correct=results.join(" ثم ");
+    const r=mkOpts(correct,[lst.map(x=>String(+(x/div))).join(" ثم "),lst.join(" ثم "),results.slice(1).join(" ثم ")]);
     return{t:"for in list",q:"ما ناتج هذا الكود؟",
-      c:`num = ${JSON.stringify(lst)}\nfor c in num:\n    if c > ${thresh}:\n        print(c / ${div})\n    else:\n        print(c)`,
-      o,a,e:`${thresh} لا يحقق c>${thresh} فيطبع ${thresh}. البقية تُقسم على ${div}: ${results.join('، ')}.`};
+      c:"num = "+JSON.stringify(lst)+"\nfor c in num:\n    if c > "+base+":\n        print(c / "+div+")\n    else:\n        print(c)",
+      o:r.o,a:r.a,e:base+" لا يحقق c>"+base+" فيطبع "+base+". البقية تُقسم على "+div+": "+results.join("، ")+"."};
   },
-  // Q9 - for in string count char — randomise word and char
   ()=>{
-    const wordPairs=[["Manama","a",3],["Bahrain","a",2],["Alabama","a",4],["banana","a",3],["Python","n",1],["Mississippi","s",4]];
-    const [word,ch,count]=randPick(wordPairs);
-    const {o,a}=mkOpts(`The number of char.${ch} is ${count}`,[`The number of char.${ch} is ${count+1}`,`The number of char.${ch} is ${count-1}`,`The number of char.${ch} is 0`]);
+    const pairs=[["Manama","a",3],["Bahrain","a",2],["Alabama","a",4],["banana","a",3],["Python","n",1],["Mississippi","s",4]];
+    const row=randPick(pairs);const word=row[0],ch=row[1],count=row[2];
+    const r=mkOpts("The number of char."+ch+" is "+count,["The number of char."+ch+" is "+(count+1),"The number of char."+ch+" is "+(count-1),"The number of char."+ch+" is 0"]);
     return{t:"for in string",q:"ما ناتج هذا الكود؟",
-      c:`counter = 0\nword = "${word}"\nfor i in word:\n    if i == "${ch}":\n        counter = counter + 1\nprint("The number of char.${ch} is", counter)`,
-      o,a,e:`في كلمة "${word}"، الحرف '${ch}' يظهر ${count} مرات.`};
+      c:"counter = 0\nword = \""+word+"\"\nfor i in word:\n    if i == \""+ch+"\":\n        counter = counter + 1\nprint(\"The number of char."+ch+" is\", counter)",
+      o:r.o,a:r.a,e:"في كلمة \""+word+"\"، الحرف '"+ch+"' يظهر "+count+" مرات."};
   },
-  // Q10 - for in string: correct loop variable — randomise var name and string
   ()=>{
     const strs=["bahrain is beautiful","python is great","hello world","coding is fun"];
     const s=randPick(strs);
     const varName=randPick(["a","c","x","letter"]);
     const ch=randPick(["i","a","o","e"]);
     const count=[...s].filter(x=>x===ch).length;
-    const correctOpt=`if ${varName} == "${ch}"`;
-    const wrongOpts=[`if x == "${ch}"`,`if c == "${ch}"`,`if i == "${ch}"`,`if counter == "${ch}"`].filter(x=>x!==correctOpt);
-    const {o,a}=mkOpts(correctOpt, wrongOpts);
-    return{t:"for in string",q:`أكمل الفراغ: لعدّ حرف '${ch}' في المتغير x، أيٌّ من التالي صحيح؟`,
-      c:`x = "${s}"\nc = 0\nfor ${varName} in x:\n    if ____ == "${ch}":\n        c = c + 1\nprint(c)`,
-      o,a,e:`متغير التكرار هو ${varName}، لذا الشرط الصحيح هو: if ${varName} == "${ch}". الناتج: ${count}.`};
-  }
-],
+    const correctOpt="if "+varName+" == \""+ch+"\"";
+    const wrongOpts=["if x == \""+ch+"\"","if c == \""+ch+"\"","if i == \""+ch+"\"","if counter == \""+ch+"\""].filter(x=>x!==correctOpt);
+    const r=mkOpts(correctOpt,wrongOpts);
+    return{t:"for in string",q:"أكمل الفراغ: لعدّ حرف '"+ch+"' في المتغير x، أيٌّ من التالي صحيح؟",
+      c:"x = \""+s+"\"\nc = 0\nfor "+varName+" in x:\n    if ____ == \""+ch+"\":\n        c = c + 1\nprint(c)",
+      o:r.o,a:r.a,e:"متغير التكرار هو "+varName+"، لذا الشرط الصحيح هو: if "+varName+" == \""+ch+"\". الناتج: "+count+"."};
+  }];
 
-hard:[
-  // Q1 - datetime: strftime %B for different months — randomise
+  const hard=[
   ()=>{
-    const m=rnd(1,12), y=rnd(2010,2026), d=rnd(1,28);
-    const mn=MONTHS[m-1];
-    const wrong1=MONTHS[(m)%12], wrong2=String(y), wrong3=String(d).padStart(2,'0');
-    const {o,a}=mkOpts(mn,[wrong1,wrong2,wrong3]);
+    const m=rnd(1,12),y=rnd(2010,2026),d=rnd(1,28);
+    const mn=MN[m-1];
+    const r=mkOpts(mn,[MN[m%12],String(y),String(d).padStart(2,"0")]);
     return{t:"datetime",q:"ما ناتج هذا الكود؟",
-      c:`from datetime import date\nA = date(${y}, ${m}, ${d})\nprint( A.strftime("%B") )`,
-      o,a,e:`%B تعطي اسم الشهر بالإنجليزية. الشهر ${m} هو ${mn}.`};
+      c:"from datetime import date\nA = date("+y+", "+m+", "+d+")\nprint( A.strftime(\"%B\") )",
+      o:r.o,a:r.a,e:"%B تعطي اسم الشهر بالإنجليزية. الشهر "+m+" هو "+mn+"."};
   },
-  // Q2 - datetime: choose correct import for date+time
+  ()=>({t:"datetime",q:"أي كود يطبع التاريخ والوقت معاً؟",c:null,
+    o:["from datetime import date\nprint(date.today())","from datetime import datetime\nprint(datetime.now())","from datetime import date\nprint(date.now())","import datetime\nprint(datetime.today())"],a:1,
+    e:"للتاريخ والوقت معاً: from datetime import datetime ثم datetime.now()."}),
   ()=>{
-    return{t:"datetime",q:"أي كود يطبع التاريخ والوقت معاً؟",c:null,
-      o:["from datetime import date\nprint(date.today())","from datetime import datetime\nprint(datetime.now())","from datetime import date\nprint(date.now())","import datetime\nprint(datetime.today())"],a:1,
-      e:"للتاريخ والوقت معاً: from datetime import datetime ثم datetime.now()."};
-  },
-  // Q3 - random: randint range description — randomise
-  ()=>{
-    const a=rnd(1,10), b=a+rnd(3,10);
-    const {o,a:ans}=mkOpts(`بين ${a} و ${b} شاملاً`,[`بين ${a} و ${b-1} فقط`,`بين 0 و ${b}`,`دائماً يطبع ${Math.floor((a+b)/2)}`]);
+    const a=rnd(1,10),b=a+rnd(3,10);
+    const r=mkOpts("بين "+a+" و "+b+" شاملاً",["بين "+a+" و "+(b-1)+" فقط","بين 0 و "+b,"دائماً يطبع "+Math.floor((a+b)/2)]);
     return{t:"random",q:"ما الوصف الصحيح لناتج هذا الكود؟",
-      c:`import random\nx = random.randint(${a}, ${b})\nprint(x)`,
-      o,a:ans,e:`randint(${a},${b}) يشمل الحدين، فالأرقام الممكنة بين ${a} و ${b}.`};
+      c:"import random\nx = random.randint("+a+", "+b+")\nprint(x)",
+      o:r.o,a:r.a,e:"randint("+a+","+b+") يشمل الحدين، فالأرقام الممكنة بين "+a+" و "+b+"."};
   },
-  // Q4 - random: randrange with step — randomise
   ()=>{
-    const step=randPick([2,3,5]); const a=randPick([0,2,4,6]); const b=a+step*rnd(3,5);
-    const possibles=[];for(let i=a;i<b;i+=step)possibles.push(i);
-    const correct=possibles.join('-');
-    const {o,a:ans}=mkOpts(correct,[[...possibles,b].join('-'),possibles.slice(1).join('-')||'0',`${a+1}-${a+1+step}`]);
+    const step=randPick([2,3,5]);const a=randPick([0,2,4,6]);const b=a+step*rnd(3,5);
+    const poss=[];for(let i=a;i<b;i+=step)poss.push(i);
+    const correct=poss.join("-");
+    const r=mkOpts(correct,[[...poss,b].join("-"),poss.length>1?poss.slice(1).join("-"):"1",(a+1)+"-"+(a+1+step)]);
     return{t:"random",q:"ما الأرقام الممكنة في هذا الكود؟",
-      c:`import random\nx = random.randrange(${a}, ${b}, ${step})\nprint(x)`,
-      o,a:ans,e:`randrange(${a},${b},${step}): يبدأ من ${a} بخطوة ${step} ولا يشمل ${b}. الأرقام: ${correct}.`};
+      c:"import random\nx = random.randrange("+a+", "+b+", "+step+")\nprint(x)",
+      o:r.o,a:r.a,e:"randrange("+a+","+b+","+step+"): يبدأ من "+a+" بخطوة "+step+" ولا يشمل "+b+". الأرقام: "+correct+"."};
   },
-  // Q5 - if/elif: x/2 result — randomise x (odd)
   ()=>{
     const odds=[11,13,15,17,19,21];const x=randPick(odds);
-    const y=x/2; // float
-    // y < 10 for small x, y > 10 for large
+    const y=x/2;
     const correct=y>10?String(+(y-2)):String(Math.round(y));
-    const branch=y>10?`y > 10 → يطبع y - 2 = ${+(y-2)}`:`y لا يحقق y>10 ولا y==10 → يطبع round(${y}) = ${Math.round(y)}`;
-    const {o,a}=mkOpts(correct,[String(y),String(Math.round(y)+1),"خطأ"]);
+    const branch=y>10?"y > 10 → يطبع y - 2 = "+(+(y-2)):"y لا يحقق y>10 ولا y==10 → يطبع round("+y+") = "+Math.round(y);
+    const r=mkOpts(correct,[String(y),String(Math.round(y)+1),"خطأ"]);
     return{t:"if / else",q:"ما ناتج هذا الكود؟",
-      c:`x = ${x}\ny = x / 2\nif y > 10:\n    print(y - 2)\nelif y == 10:\n    print(y)\nelse:\n    print(round(y))`,
-      o,a,e:`y = ${x}/2 = ${y}. ${branch}.`};
+      c:"x = "+x+"\ny = x / 2\nif y > 10:\n    print(y - 2)\nelif y == 10:\n    print(y)\nelse:\n    print(round(y))",
+      o:r.o,a:r.a,e:"y = "+x+"/2 = "+y+". "+branch+"."};
   },
-  // Q6 - if/else: even/odd — randomise number
   ()=>{
-    const num=rnd(2,20);
-    const isEven=num%2===0;
+    const num=rnd(2,20);const isEven=num%2===0;
     const correct=isEven?"عدد زوجي":"عدد فردي";
-    const {o,a}=mkOpts(correct,[isEven?"عدد فردي":"عدد زوجي","0","خطأ"]);
+    const r=mkOpts(correct,[isEven?"عدد فردي":"عدد زوجي","0","خطأ"]);
     return{t:"if / else",q:"ما ناتج هذا الكود؟",
-      c:`num = ${num}\nif num % 2 == 0:\n    print("عدد زوجي")\nelse:\n    print("عدد فردي")`,
-      o,a,e:`${num} % 2 = ${num%2}. ${isEven?'الشرط محقق':'الشرط غير محقق'} فيطبع: ${correct}.`};
+      c:"num = "+num+"\nif num % 2 == 0:\n    print(\"عدد زوجي\")\nelse:\n    print(\"عدد فردي\")",
+      o:r.o,a:r.a,e:num+" % 2 = "+(num%2)+". "+(isEven?"الشرط محقق":"الشرط غير محقق")+" فيطبع: "+correct+"."};
   },
-  // Q7 - for in list: startswith condition — randomise letter and words
   ()=>{
-    const letters=['b','s','m','c','p'];
-    const ch=randPick(letters);
-    const allWords={b:["base","door","book","break","Boat"],s:["sun","moon","star","sky","sea"],m:["map","door","moon","mat","cat"],c:["cat","dog","cup","car","tree"],p:["pen","book","python","pan","run"]};
-    const ws=allWords[ch];
-    const {o,a}=mkOpts(`w[0] == '${ch}'`,[`w == '${ch}'`,`w[1] == '${ch}'`,`len(w) == '${ch}'`]);
-    return{t:"for in list",q:`أي شرط يطبع الكلمات التي تبدأ بحرف '${ch}' فقط؟`,
-      c:`words = ${JSON.stringify(ws)}\nfor w in words:\n    if ______:\n        print(w)`,
-      o,a,e:`w[0] يعطي أول حرف في الكلمة. نقارنه بـ '${ch}' لتحديد الكلمات التي تبدأ بهذا الحرف.`};
+    const ch=randPick(["b","s","m","c","p"]);
+    const aw={b:["base","door","book","break","boat"],s:["sun","moon","star","sky","sea"],m:["map","door","moon","mat","cat"],c:["cat","dog","cup","car","tree"],p:["pen","book","python","pan","run"]};
+    const r=mkOpts("w[0] == '"+ch+"'",["w == '"+ch+"'","w[1] == '"+ch+"'","len(w) == '"+ch+"'"]);
+    return{t:"for in list",q:"أي شرط يطبع الكلمات التي تبدأ بحرف '"+ch+"' فقط؟",
+      c:"words = "+JSON.stringify(aw[ch])+"\nfor w in words:\n    if ______:\n        print(w)",
+      o:r.o,a:r.a,e:"w[0] يعطي أول حرف في الكلمة. نقارنه بـ '"+ch+"' لتحديد الكلمات التي تبدأ بهذا الحرف."};
   },
-  // Q8 - for in list: len condition — randomise target length
   ()=>{
-    const lens=[3,4,5,6];const target=randPick(lens);
-    const pool=["free","door","tree","python","cat","hello","go","mango","sun","school"];
-    const matching=pool.filter(w=>w.length===target);
-    const {o,a}=mkOpts(`len(w) == ${target}`,[`len(w) > ${target}`,`len(w) < ${target}`,`w == ${target}`]);
-    return{t:"for in list",q:`أي شرط يطبع الكلمات المكوّنة من ${target} أحرف فقط؟`,
-      c:`words = ${JSON.stringify(pool.slice(0,5))}\nfor w in words:\n    if ______:\n        print(w)`,
-      o,a,e:`len(w) تعطي عدد أحرف الكلمة. للطباعة عند ${target} أحرف فقط نكتب: if len(w) == ${target}.`};
+    const target=randPick([3,4,5,6]);
+    const pool=["free","door","tree","python","cat"];
+    const r=mkOpts("len(w) == "+target,["len(w) > "+target,"len(w) < "+target,"w == "+target]);
+    return{t:"for in list",q:"أي شرط يطبع الكلمات المكوّنة من "+target+" أحرف فقط؟",
+      c:"words = "+JSON.stringify(pool)+"\nfor w in words:\n    if ______:\n        print(w)",
+      o:r.o,a:r.a,e:"len(w) تعطي عدد أحرف الكلمة. للطباعة عند "+target+" أحرف فقط نكتب: if len(w) == "+target+"."};
   },
-  // Q9 - for in list print elements — randomise list of numbers
   ()=>{
     const lst=[rnd(1,10),rnd(11,20),rnd(21,30),rnd(31,40)];
-    const correct=lst.join(' ثم ');
-    const {o,a}=mkOpts(correct,[lst.join(' ')+" في سطر واحد",`${lst[0]} فقط`,"خطأ"]);
+    const correct=lst.join(" ثم ");
+    const r=mkOpts(correct,[lst.join(" ")+" في سطر واحد",lst[0]+" فقط","خطأ"]);
     return{t:"for in list",q:"ما ناتج هذا الكود؟",
-      c:`grades = ${JSON.stringify(lst)}\nfor i in grades:\n    print(i)`,
-      o,a,e:`for in list تطبع كل عنصر في سطر مستقل: ${correct}.`};
+      c:"grades = "+JSON.stringify(lst)+"\nfor i in grades:\n    print(i)",
+      o:r.o,a:r.a,e:"for in list تطبع كل عنصر في سطر مستقل: "+correct+"."};
   },
-  // Q10 - for in list subtract — randomise list and subtract value
   ()=>{
     const sub=randPick([1,2,3,5]);
     const lst=[rnd(5,10),rnd(11,16),rnd(17,22),rnd(23,28)];
     const results=lst.map(x=>x-sub);
-    const correct=results.join(' ثم ');
-    const {o,a}=mkOpts(correct,[lst.join(' ثم '),lst.map(x=>x+sub).join(' ثم '),"خطأ"]);
+    const correct=results.join(" ثم ");
+    const r=mkOpts(correct,[lst.join(" ثم "),lst.map(x=>x+sub).join(" ثم "),"خطأ"]);
     return{t:"for in list",q:"ما ناتج هذا الكود؟",
-      c:`n = ${JSON.stringify(lst)}\nfor i in n:\n    print(i - ${sub})`,
-      o,a,e:`كل عنصر يُطرح منه ${sub}: ${lst.map((x,i)=>`${x}-${sub}=${results[i]}`).join('، ')}. فيُطبع: ${correct}.`};
-  }
-]};
+      c:"n = "+JSON.stringify(lst)+"\nfor i in n:\n    print(i - "+sub+")",
+      o:r.o,a:r.a,e:"كل عنصر يُطرح منه "+sub+": "+lst.map((x,i)=>x+"-"+sub+"="+results[i]).join("، ")+". فيُطبع: "+correct+"."};
+  }];
+
+  return {easy,medium,hard}[lvl];
+}
 
 /* ---- BUILD QS FROM GENERATORS ---- */
 function buildQS(){
   const out={easy:[],medium:[],hard:[]};
-  ['easy','medium','hard'].forEach(lvl=>{
-    QGEN[lvl].forEach(gen=>out[lvl].push(gen()));
+  ["easy","medium","hard"].forEach(lvl=>{
+    makeGenerators(lvl).forEach(gen=>out[lvl].push(gen()));
   });
   return out;
 }
