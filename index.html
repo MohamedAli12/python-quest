@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Quest — تعلم البرمجة</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface2: #1e2631;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,0.12);
+    --blue: #58a6ff;
+    --blue-dim: rgba(88,166,255,0.12);
+    --amber: #d29922;
+    --amber-dim: rgba(210,153,34,0.12);
+    --red: #f85149;
+    --red-dim: rgba(248,81,73,0.12);
+    --purple: #bc8cff;
+    --purple-dim: rgba(188,140,255,0.12);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .logo-snake {
+    font-size: 22px;
+  }
+  .topbar-stats {
+    display: flex;
+    gap: 10px;
+  }
+  .badge {
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .badge-score { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-lives { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+
+  /* MAIN */
+  main {
+    width: 100%;
+    max-width: 680px;
+    padding: 2rem 1.25rem;
+  }
+
+  /* LEVEL TABS */
+  .levels {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .lvl-btn {
+    padding: 7px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .lvl-btn:hover { background: var(--surface2); color: var(--text); }
+  .lvl-btn.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(63,185,80,0.4); }
+
+  /* PROGRESS */
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 8px rgba(63,185,80,0.4);
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-topic {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: var(--blue-dim);
+    color: var(--blue);
+    margin-bottom: 1rem;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+    color: #e6edf3;
+  }
+  .kw { color: #ff7b72; }
+  .str { color: #a5d6ff; }
+  .num { color: #f2cc60; }
+  .fn { color: #d2a8ff; }
+  .cm { color: #6e7681; font-style: italic; }
+
+  /* OPTIONS */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .opt-btn {
+    text-align: right;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    transition: all 0.15s;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: var(--blue-dim);
+    color: var(--blue);
+  }
+  .opt-btn.correct {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .opt-btn.wrong {
+    background: var(--red-dim);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  /* FEEDBACK */
+  .feedback {
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    font-size: 14px;
+    line-height: 1.7;
+    display: none;
+    margin-top: 0.25rem;
+  }
+  .feedback.show { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback.correct { background: var(--accent-dim); color: #7ee787; border: 1px solid rgba(63,185,80,0.25); }
+  .feedback.wrong { background: var(--red-dim); color: #ff9492; border: 1px solid rgba(248,81,73,0.25); }
+
+  /* NEXT */
+  .next-btn {
+    margin-top: 1rem;
+    padding: 0.65rem 1.75rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 500;
+    display: none;
+    transition: all 0.15s;
+  }
+  .next-btn.show { display: inline-flex; align-items: center; gap: 6px; }
+  .next-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+
+  /* GAME OVER */
+  .gameover {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+  }
+  .go-label { font-size: 14px; color: var(--muted); margin-bottom: 0.5rem; }
+  .go-score { font-size: 56px; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 0.5rem; font-family: 'IBM Plex Mono', monospace; }
+  .go-total { font-size: 16px; color: var(--muted); margin-bottom: 0.5rem; }
+  .go-msg { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 2rem; }
+  .restart-btn {
+    padding: 0.75rem 2.5rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(63,185,80,0.4);
+    background: var(--accent-dim);
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 16px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .restart-btn:hover { background: rgba(63,185,80,0.25); }
+
+  /* FOOTER */
+  footer {
+    margin-top: auto;
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 480px) {
+    .options { grid-template-columns: 1fr; }
+    .topbar { padding: 0.75rem 1rem; }
+    main { padding: 1.25rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <span class="logo-snake">🐍</span>
+    Python Quest
+  </div>
+  <div class="topbar-stats">
+    <span class="badge badge-score" id="score-el">نقاط: 0</span>
+    <span class="badge badge-lives" id="lives-el">♥ ♥ ♥</span>
+  </div>
+</div>
+
+<main>
+  <div class="levels">
+    <button class="lvl-btn active" onclick="setLevel('beginner',this)">🟢 مبتدئ</button>
+    <button class="lvl-btn" onclick="setLevel('intermediate',this)">🔵 متوسط</button>
+    <button class="lvl-btn" onclick="setLevel('advanced',this)">🔴 متقدم</button>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="prog-text">السؤال 1 من 6</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  </div>
+
+  <div id="q-area"></div>
+  <div id="go-area" style="display:none"></div>
+</main>
+
+<footer>Python Quest — تمارين تفاعلية لتعلم البرمجة بـ Python</footer>
+
+<script>
+const Q = {
+  beginner: [
+    { topic:"المتغيرات", q:"ما قيمة x بعد تنفيذ هذا الكود؟",
+      code:`x = 5\nx = x + 3\n<span class="fn">print</span>(x)`,
+      opts:["5","3","8","53"], ans:2,
+      ex:"x تبدأ بقيمة 5، نضيف 3 فتصبح 8." },
+    { topic:"النصوص", q:"ما الذي تطبعه هذه الدالة؟",
+      code:`name = <span class="str">"Python"</span>\n<span class="fn">print</span>(<span class="fn">len</span>(name))`,
+      opts:["5","6","7","Python"], ans:1,
+      ex:"كلمة 'Python' تحتوي على 6 أحرف، len() تُرجع عددها." },
+    { topic:"الشروط", q:"ماذا يطبع هذا البرنامج؟",
+      code:`x = <span class="num">10</span>\n<span class="kw">if</span> x > <span class="num">5</span>:\n    <span class="fn">print</span>(<span class="str">"كبير"</span>)\n<span class="kw">else</span>:\n    <span class="fn">print</span>(<span class="str">"صغير"</span>)`,
+      opts:["صغير","كبير","10","خطأ"], ans:1,
+      ex:"10 أكبر من 5، لذا يُطبع 'كبير'." },
+    { topic:"القوائم", q:"ما هو ناتج هذا الكود؟",
+      code:`fruits = [<span class="str">"تفاح"</span>, <span class="str">"موز"</span>, <span class="str">"برتقال"</span>]\n<span class="fn">print</span>(fruits[<span class="num">1</span>])`,
+      opts:["تفاح","موز","برتقال","خطأ"], ans:1,
+      ex:"الفهارس تبدأ من 0، لذا fruits[1] هو العنصر الثاني: 'موز'." },
+    { topic:"الحلقات", q:"كم مرة سيُطبع 'مرحبا'؟",
+      code:`<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n    <span class="fn">print</span>(<span class="str">"مرحبا"</span>)`,
+      opts:["3","4","5","1"], ans:1,
+      ex:"range(4) تُنتج 0،1،2،3 — أي 4 تكرارات." },
+    { topic:"الدوال", q:"ما هو الناتج عند استدعاء الدالة؟",
+      code:`<span class="kw">def</span> <span class="fn">double</span>(n):\n    <span class="kw">return</span> n * <span class="num">2</span>\n\n<span class="fn">print</span>(<span class="fn">double</span>(<span class="num">7</span>))`,
+      opts:["7","2","14","9"], ans:2,
+      ex:"الدالة تُرجع n×2، عند تمرير 7 يكون الناتج 14." }
+  ],
+  intermediate: [
+    { topic:"القواميس", q:"ما هو الناتج؟",
+      code:`student = {<span class="str">"name"</span>: <span class="str">"Ali"</span>, <span class="str">"grade"</span>: <span class="num">90</span>}\n<span class="fn">print</span>(student[<span class="str">"grade"</span>] + <span class="num">5</span>)`,
+      opts:["90","95","905","خطأ"], ans:1,
+      ex:"student['grade'] = 90، ثم 90+5 = 95." },
+    { topic:"الاستثناءات", q:"أي خيار يُعالج خطأ القسمة على صفر بشكل صحيح؟",
+      code:`<span class="cm"># كيف نُعالج هذا الخطأ؟</span>\nresult = <span class="num">10</span> / <span class="num">0</span>`,
+      opts:["if 0: ...","try/except ZeroDivisionError","catch(0)","error(0)"], ans:1,
+      ex:"في Python نستخدم try/except، وZeroDivisionError هو الاستثناء المناسب." },
+    { topic:"List Comprehension", q:"ماذا يحتوي squares؟",
+      code:`squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">4</span>)]`,
+      opts:["[1, 4, 9]","[1, 2, 3]","[2, 4, 6]","[0, 1, 4]"], ans:0,
+      ex:"range(1,4) يُنتج 1،2،3 — مربعاتها 1،4،9." },
+    { topic:"المعاملات الافتراضية", q:"ما هي قيمة result؟",
+      code:`<span class="kw">def</span> <span class="fn">calc</span>(a, b=<span class="num">10</span>):\n    <span class="kw">return</span> a + b\n\nresult = <span class="fn">calc</span>(<span class="num">5</span>)`,
+      opts:["5","10","15","خطأ"], ans:2,
+      ex:"b له قيمة افتراضية 10، فـ calc(5) تُعادل calc(5,10) = 15." },
+    { topic:"تقطيع النصوص", q:"ما هو الناتج؟",
+      code:`text = <span class="str">"Hello, Python!"</span>\n<span class="fn">print</span>(text[<span class="num">7</span>:<span class="num">13</span>])`,
+      opts:["Hello,","Python"," Pytho","Python!"], ans:1,
+      ex:"text[7:13] تأخذ الأحرف من موضع 7 إلى 12 وهي 'Python'." },
+    { topic:"الكلاسات", q:"ماذا يطبع هذا الكود؟",
+      code:`<span class="kw">class</span> <span class="fn">Dog</span>:\n    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, name):\n        <span class="kw">self</span>.name = name\n\ndog = <span class="fn">Dog</span>(<span class="str">"Rex"</span>)\n<span class="fn">print</span>(dog.name)`,
+      opts:["Dog","Rex","name","self"], ans:1,
+      ex:"__init__ يُخزّن name، عند إنشاء Dog('Rex') يُطبع 'Rex'." }
+  ],
+  advanced: [
+    { topic:"المولّدات", q:"أيهما يستخدم ذاكرة أقل؟",
+      code:`A = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1000000</span>)]\nB = (x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1000000</span>))`,
+      opts:["A أسرع دائماً","B يستخدم ذاكرة أقل (generator)","لا فرق","A أقل ذاكرة"], ans:1,
+      ex:"B هو generator يُنتج القيم عند الطلب (lazy)، بينما A يُخزّن كل القيم مرة واحدة." },
+    { topic:"الديكوريتور", q:"ما وظيفة @staticmethod؟",
+      code:`<span class="kw">class</span> <span class="fn">Math</span>:\n    @<span class="fn">staticmethod</span>\n    <span class="kw">def</span> <span class="fn">add</span>(a, b):\n        <span class="kw">return</span> a + b\n\n<span class="fn">print</span>(<span class="fn">Math</span>.<span class="fn">add</span>(<span class="num">3</span>, <span class="num">4</span>))`,
+      opts:["تجعل الدالة خاصة","دالة لا تحتاج self أو cls","تُسرّع التنفيذ","تمنع التعديل"], ans:1,
+      ex:"@staticmethod يجعل الدالة مستقلة عن الكلاس والمثيل، يُستدعى مباشرة من الكلاس." },
+    { topic:"Lambda / Map", q:"ما هو ناتج هذا الكود؟",
+      code:`nums = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]\nresult = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x * <span class="num">3</span>, nums))\n<span class="fn">print</span>(result)`,
+      opts:["[1,2,3,4]","[3,6,9,12]","[4,5,6,7]","[3,2,3,4]"], ans:1,
+      ex:"map تُطبّق lambda على كل عنصر، كل عنصر × 3 = [3,6,9,12]." },
+    { topic:"Context Manager", q:"ما ميزة استخدام with عند فتح الملفات؟",
+      code:`<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"data.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:\n    content = f.<span class="fn">read</span>()\n<span class="cm"># الملف مُغلق هنا تلقائياً</span>`,
+      opts:["تُسرّع القراءة","تُغلق الملف تلقائياً عند الانتهاء","تُحوّل الملف لقاموس","لا ميزة خاصة"], ans:1,
+      ex:"with يضمن إغلاق الملف تلقائياً حتى لو حدث استثناء." },
+    { topic:"الوراثة", q:"ما هو الناتج؟",
+      code:`<span class="kw">class</span> <span class="fn">Animal</span>:\n    <span class="kw">def</span> <span class="fn">speak</span>(<span class="kw">self</span>):\n        <span class="kw">return</span> <span class="str">"..."</span>\n\n<span class="kw">class</span> <span class="fn">Cat</span>(<span class="fn">Animal</span>):\n    <span class="kw">def</span> <span class="fn">speak</span>(<span class="kw">self</span>):\n        <span class="kw">return</span> <span class="str">"مياو"</span>\n\n<span class="fn">print</span>(<span class="fn">Cat</span>().<span class="fn">speak</span>())`,
+      opts:["...","مياو","Animal","خطأ"], ans:1,
+      ex:"Cat يُعيد تعريف speak (override)، لذا يُطبع 'مياو'." },
+    { topic:"الاستثناءات المخصصة", q:"كيف نُعرّف استثناءً مخصصاً في Python؟",
+      code:`<span class="cm"># ما الطريقة الصحيحة؟</span>`,
+      opts:["class MyError(Exception): pass","def MyError(): raise","error MyError = new Error()","MyError = exception()"], ans:0,
+      ex:"الاستثناءات المخصصة تُعرَّف كـ class يرث من Exception." }
+  ]
+};
+
+let level = 'beginner', qs = [], idx = 0, score = 0, lives = 3, done = false;
+
+function shuffle(a){ return [...a].sort(()=>Math.random()-0.5); }
+
+function setLevel(l, btn){
+  level = l;
+  document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  restart();
+}
+
+function restart(){
+  qs = shuffle(Q[level]);
+  idx = 0; score = 0; lives = 3; done = false;
+  document.getElementById('go-area').style.display='none';
+  document.getElementById('q-area').style.display='block';
+  updateHUD();
+  render();
+}
+
+function updateHUD(){
+  document.getElementById('score-el').textContent = 'نقاط: '+score;
+  document.getElementById('lives-el').textContent = ['♥','♥','♥'].map((h,i)=>i<lives?h:'♡').join(' ');
+  const pct = Math.round(idx/qs.length*100);
+  document.getElementById('progress').style.width = pct+'%';
+  document.getElementById('prog-text').textContent = `السؤال ${Math.min(idx+1,qs.length)} من ${qs.length}`;
+  document.getElementById('prog-pct').textContent = pct+'%';
+}
+
+function render(){
+  if(idx >= qs.length){ showEnd(); return; }
+  done = false;
+  const q = qs[idx];
+  document.getElementById('q-area').innerHTML = `
+    <div class="q-card">
+      <span class="q-topic">${q.topic}</span>
+      <p class="q-text">${q.q}</p>
+      ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
+      <div class="options">
+        ${q.opts.map((o,i)=>`<button class="opt-btn" onclick="pick(${i})">${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb"></div>
+      <button class="next-btn" id="nxt" onclick="next()">
+        ${idx+1<qs.length?'السؤال التالي ←':'عرض النتيجة ←'}
+      </button>
+    </div>`;
+}
+
+function pick(i){
+  if(done) return;
+  done = true;
+  const q = qs[idx];
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b=>b.disabled=true);
+  const fb = document.getElementById('fb');
+  const nxt = document.getElementById('nxt');
+  if(i===q.ans){
+    btns[i].classList.add('correct');
+    score+=10;
+    fb.className='feedback show correct';
+    fb.textContent='✓ إجابة صحيحة! '+q.ex;
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
+    lives--;
+    fb.className='feedback show wrong';
+    fb.textContent='✗ إجابة خاطئة. '+q.ex;
+  }
+  updateHUD();
+  nxt.classList.add('show');
+  if(lives<=0) setTimeout(showEnd,1600);
+}
+
+function next(){ idx++; updateHUD(); render(); }
+
+function showEnd(){
+  document.getElementById('q-area').style.display='none';
+  const area = document.getElementById('go-area');
+  area.style.display='block';
+  const total = qs.length*10;
+  const pct = Math.round(score/total*100);
+  const msg = pct>=80?'🎉 ممتاز! أداء رائع':pct>=50?'👍 جيد! استمر في التدريب':'📚 تحتاج مزيداً من الممارسة';
+  area.innerHTML=`
+    <div class="gameover">
+      <p class="go-label">النتيجة النهائية</p>
+      <div class="go-score">${score}</div>
+      <p class="go-total">من ${total} نقطة — ${pct}%</p>
+      <p class="go-msg">${msg}</p>
+      <button class="restart-btn" onclick="restart()">↺ إعادة اللعب</button>
+    </div>`;
+}
+
+restart();
+</script>
+</body>
+</html>
